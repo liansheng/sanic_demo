@@ -12,7 +12,7 @@ from sanic.response import (
 from sanic_jwt import BaseEndpoint, exceptions
 
 from obj.models.user_model import UserModel
-from obj.user.user_marshal import UserResister
+from obj.user.user_marshal import UserResister, UserRegisteredOnlyRead
 from obj.user.user_model import UserResisterSchema, RegisterPhoneSchema
 from obj.util.marshal_with.data_check import typeassert, typeassert_async
 from obj.util.responsePack import response_package
@@ -28,13 +28,15 @@ class MyCustomUserAuthHelper:
     async def register_new_user(self, registered_phone, password):
         user_data = UserResister(registered_phone, password,
                                  user_model=self.user_model).to_dict()
+        doc = await self.user_model.create(user_data)
         print(user_data)
-        res = await self.user_model.create(user_data)
-        res_data = {}
-        res_data["registered_phone"] = user_data["registered_phone"]
+        return UserRegisteredOnlyRead(user_data).to_dict()
+        # res_data = {}
+        # res_data["registered_phone"] = user_data["registered_phone"]
         # res_data["id"] = user_model.get_id(user_data)
-        res_data["id"] = str(res.inserted_id)
-        return res_data
+        # res_data["id"] = str(doc.inserted_id)
+        # print("doc ccccccccc ", doc)
+        # return res_data
 
     @typeassert_async(RegisterPhoneSchema)
     async def check_registered_phone(self, registered_phone):
