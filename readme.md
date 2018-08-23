@@ -1,1 +1,1 @@
-# sanic demo for loggin and rigistered
+# sanic demo for logging and rigistered
