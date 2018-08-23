@@ -14,6 +14,47 @@ import datetime as dt
 from bson import ObjectId
 
 
+class Follower(MongoDBModel):
+    coll_name = "follower"
+
+    async def find_following_count_by_user_id(self, user_id):
+        """
+
+        :param user_id:
+        :return: 关注数量
+        """
+        following_list = await self.find({"myself": ObjectId(user_id)})
+        return following_list.count()
+
+    async def find_followers_count_by_user_id(self, user_id):
+        """
+
+        :param user_id:
+        :return: 粉丝数量
+        """
+        pass
+
+    async def update_or_created_follow_relationship(self, id_1, id_2):
+        """
+        id1 following id2
+        :param id_1:
+        :param id_2:
+        :return:
+        """
+        try:
+            following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
+            count = len(following_list)
+            if count == 1:
+                return True
+            else:
+                await self.create({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
+            return True
+        except Exception as e:
+            # log
+            raise AssertionError("关注失败")
+        return True
+
+
 class UserModel(MongoDBModel):
     coll_name = "user"
     unique_fields = ["registered_phone"]

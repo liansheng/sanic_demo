@@ -11,6 +11,7 @@ from aoiklivereload.aoiklivereload import LiveReloader
 
 from obj.bp import bp
 from obj.bp2 import bp2
+from obj.user.views.following_view import user_bp
 from sanic_jwt import initialize
 
 from obj.user.views.check_view import CheckRegisteredParm
@@ -27,6 +28,7 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 app.blueprint(bp)
 app.blueprint(bp2)
+app.blueprint(user_bp)
 
 
 

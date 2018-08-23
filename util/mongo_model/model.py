@@ -43,6 +43,10 @@ class MongoDBModel(BaseModel):
         docs = self.collection.find(kwargs).to_list(length=100)
         return docs
 
+    def find_list(self, *args, **kwargs):
+        docs = self.collection.find(kwargs)
+        return docs
+
     def find_one(self, **kwargs):
         doc = self.collection.find_one(kwargs)
         return None if doc is None else doc

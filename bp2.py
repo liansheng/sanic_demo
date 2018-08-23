@@ -7,8 +7,9 @@
 """
 from sanic import Blueprint
 from sanic.response import text
+from sanic.exceptions import SanicException
 
-bp2 = Blueprint("first_bp2", url_prefix="/api/v1")
+bp2 = Blueprint("user_manage", url_prefix="/api/v1")
 
 from sanic import Sanic
 from sanic.views import HTTPMethodView
@@ -60,11 +61,5 @@ class SimpleView2(HTTPMethodView):
         return text('I am delete method')
 
 
-bp2.add_route(SimpleView.as_view(), "/view")
+
 bp2.add_route(SimpleView2.as_view(), "/view2")
-# app.add_route(SimpleView.as_view(), '/')
-
-
-# @bp2.route("/get_info2")
-# async def get_info(request):
-#     return text("it is ok!")

@@ -25,7 +25,6 @@ from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import sys
 from obj.util.config import BASE_DIR, REDIS_CONFIG
 
-
 app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)
 app.config.update(REDIS_CONFIG)
@@ -44,7 +43,7 @@ Mongo.SetConfig(app, account_center=mongo_uri)
 Mongo(app)
 
 
-@app.exception(SanicException)
+@app.exception(SanicException, AssertionError)
 @cross_origin(app, automatic_options=True, origins="*", send_wildcard=True)
 async def process_exception(request, exception):
     status_code = str(getattr(exception, "status_code", "500"))
