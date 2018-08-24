@@ -45,7 +45,7 @@ class Follower(MongoDBModel):
             following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
             count = len(following_list)
             if count == 1:
-                return True
+                return "have"
             else:
                 await self.create({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
             return True

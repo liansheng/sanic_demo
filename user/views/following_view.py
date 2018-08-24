@@ -19,6 +19,7 @@ from sanic_jwt.decorators import protected
 from obj.util.setting import app
 from obj.user.services.CheckServices import CheckRealUserServer
 from bson import ObjectId
+from obj.util.responsePack import response_package
 
 user_bp = Blueprint("user", url_prefix="/api/v1")
 
@@ -89,20 +90,23 @@ class Follow(HTTPMethodView):
         :return:
         """
         # param check
-        print("coooooooooooooooooooooo")
-        print(request.cookies)
-        login_user_id = request.cookies.get("user_id")
+        login_user_id = request.cookies.get("user_id", None)
+        assert login_user_id, "当前没有用户登录"
         following_user_id = request.json.get("following_user_id", None)
         assert following_user_id, "参数不能为空"
+
         # 1 check user id is real user
         doc = await check_real_user_server.is_user(following_user_id, self.user_model)
+
         # 2 update or created follow relationship in mongo
         # count = self.follower_model.update_or_created_follow_relationship()
-        await self.follower_model.update_or_created_follow_relationship(login_user_id, following_user_id)
+        res = await self.follower_model.update_or_created_follow_relationship(login_user_id, following_user_id)
 
+        if res is not "have":
         # 3 update or created redis
+            await app.redis.rpush("{}_{}".format(login_user_id, "follower"), following_user_id)
 
-        return text('I am post method')
+        return json(response_package("200", {}))
 
     # def put(self, request):
     #     return text('I am put method')
