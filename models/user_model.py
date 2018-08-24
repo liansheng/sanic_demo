@@ -34,6 +34,21 @@ class Follower(MongoDBModel):
         """
         pass
 
+    async def delete_follow_relationship(self, id_1, id_2):
+        """
+
+        :param id_1:
+        :param id_2:
+        :return:
+        """
+        following_list = await self.find(myself=ObjectId(id_1), following=ObjectId(id_2))
+        count = len(following_list)
+        if count == 1:
+            self.remove_by_id(following_list[0]["_id"])
+            return True
+        else:
+            return "is_null"
+
     async def update_or_created_follow_relationship(self, id_1, id_2):
         """
         id1 following id2
@@ -141,7 +156,6 @@ class UserModel(MongoDBModel):
         """
         await self.add_following_count(user_id_1)
         await self.add_followers_count(user_id_2)
-        pass
 
     async def add_following_count(self, user_id):
         """
@@ -157,3 +171,47 @@ class UserModel(MongoDBModel):
         :return:
         """
         self.inc_field_by_user_id(user_id_2, "followers_count", 1)
+
+    async def sub_following_count(self, user_id):
+        """
+
+        :param user_id:
+        :return:
+        """
+        is_zero = await self.field_is_zero(user_id, "following_count")
+        if is_zero:
+            return True
+        self.inc_field_by_user_id(user_id, "following_count", -1)
+
+    async def sub_followers_count(self, user_id_2):
+        """
+        delete followers need check count is not = 0
+        if count is 0,then not need -1
+        :param user_id_2:
+        :return:
+        """
+        is_zero = await self.field_is_zero(user_id_2, "followers_count")
+        if is_zero:
+            return True
+        self.inc_field_by_user_id(user_id_2, "followers_count", -1)
+
+    async def field_is_zero(self, user_id, field):
+        """
+        :param user_id:
+        :return:
+        """
+        doc = await self.find_by_id(user_id)
+        res = doc.get(field, None)
+        if res == 0:
+            return True
+        else:
+            return False
+
+    async def sub_follow_count(self, user_id_1, user_id_2):
+        """
+        :param user_id_1:
+        :param user_id_2:
+        :return:
+        """
+        await self.sub_following_count(user_id_1)
+        await self.sub_followers_count(user_id_2)
