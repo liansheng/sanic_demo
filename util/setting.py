@@ -79,6 +79,12 @@ async def process(consumer):
               msg.key, msg.value, msg.timestamp)
 
 
+@app.listener("after_server_stop")
+async def server_stop(app, loop):
+    app.redis.close()
+    await app.redis.wait_closed()
+
+
 @app.listener('before_server_start')
 async def server_init(app, loop):
     app.redis = await aioredis.create_redis_pool(app.config['redis'])
@@ -89,13 +95,23 @@ async def server_init(app, loop):
     #                              consumer_timeout_ms=1000)
     app.producer = AIOKafkaProducer(loop=loop, value_serializer=lambda v: json.dumps(v).encode('utf-8'),
                                     bootstrap_servers=kafka_host)
+    # app.consumer = AIOKafkaConsumer(
+    #     'user',
+    #     loop=loop, bootstrap_servers=kafka_host,
+    #     group_id="my-group4343")
+    await app.producer.start()
+    # await app.consumer.start()
+    # await process(app.consumer)
+
+
+@app.listener("after_server_start")
+async def after_server(app, loop):
     app.consumer = AIOKafkaConsumer(
         'user',
         loop=loop, bootstrap_servers=kafka_host,
         group_id="my-group4343")
-    await app.producer.start()
-    # await app.consumer.start()
-    # await process(app.consumer)
+    await app.consumer.start()
+    await process(app.consumer)
     # async for msg in app.consumer:
     #     print("consumed: ", msg.topic, msg.partition, msg.offset,
     #           msg.key, msg.value, msg.timestamp)

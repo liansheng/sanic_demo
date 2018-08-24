@@ -53,12 +53,12 @@ class MyAuthentication(Authentication):
         refresh_token = await utils.call(self.config.generate_refresh_token())
         user_id = await self._get_user_id(user)
         key = "refresh_token_{user_id}".format(user_id=user_id)
-        print("user  ,... ", user)
-        print("key ", key)
+        # print("user  ,... ", user)
+        # print("key ", key)
         r = await self.app.redis.get(key)
         if r:
             refresh_token = r
-        print("r -------------", r)
+        # print("r -------------", r)
         await utils.call(
             self.store_refresh_token,
             user_id=user_id,
