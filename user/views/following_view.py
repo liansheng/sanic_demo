@@ -101,9 +101,10 @@ class Follow(HTTPMethodView):
         # 2 update or created follow relationship in mongo
         # count = self.follower_model.update_or_created_follow_relationship()
         res = await self.follower_model.update_or_created_follow_relationship(login_user_id, following_user_id)
-
-        if res is not "have":
+        if res is not "existed":
+            # if login id have not follow relationship. then inc following and followers count
         # 3 update or created redis
+            await self.user_model.add_follow_count(login_user_id, following_user_id)
             await app.redis.rpush("{}_{}".format(login_user_id, "follower"), following_user_id)
 
         return json(response_package("200", {}))

@@ -42,17 +42,29 @@ class Follower(MongoDBModel):
         :return:
         """
         try:
-            following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
+            # print("myself id ", id_1, "following id ", id_2)
+            # following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
+            following_list = await self.find(myself=ObjectId(id_1), following=ObjectId(id_2))
+            # print("following_list os ", following_list)
             count = len(following_list)
             if count == 1:
-                return "have"
+                return "existed"
             else:
                 await self.create({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
             return True
         except Exception as e:
-            # log
             raise AssertionError("关注失败")
-        return True
+
+    async def add_follow(self, id_1, id_2):
+        """
+        1. add 1 following 2 in redis
+        2. add 2 followers 1 in redis
+        3. 1 following count + 1 in mongo
+        4, 2 followers count + 1 in mongo
+        :param id_1:
+        :param id_2:
+        :return:
+        """
 
 
 class UserModel(MongoDBModel):
@@ -118,3 +130,30 @@ class UserModel(MongoDBModel):
         if doc is None:
             return None
         return doc
+
+    async def add_follow_count(self, user_id_1, user_id_2):
+        """
+        add user_id_1 following count
+        add user_id_2 followers count
+        :param user_id_1:
+        :param user_id_2:
+        :return:
+        """
+        await self.add_following_count(user_id_1)
+        await self.add_followers_count(user_id_2)
+        pass
+
+    async def add_following_count(self, user_id):
+        """
+
+        :param user_id:
+        :return:
+        """
+        self.inc_field_by_user_id(user_id, "following_count", 1)
+
+    async def add_followers_count(self, user_id_2):
+        """
+        :param user_id_2:
+        :return:
+        """
+        self.inc_field_by_user_id(user_id_2, "followers_count", 1)

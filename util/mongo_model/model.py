@@ -40,6 +40,9 @@ class MongoDBModel(BaseModel):
         return valid_obj
 
     def find(self, *args, **kwargs):
+        # print("args ", args)
+        # print("kwargs ", kwargs)
+        # if kwargs:
         docs = self.collection.find(kwargs).to_list(length=100)
         return docs
 
@@ -82,3 +85,6 @@ class MongoDBModel(BaseModel):
         else:
             self.collection.delete_one({'_id': ObjectId(id)})
             return True
+
+    def inc_field_by_user_id(self, user_id, field, number):
+        self.collection.update_one({"_id": ObjectId(user_id)}, {"$inc": {field: number}})
