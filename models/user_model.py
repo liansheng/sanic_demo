@@ -14,7 +14,6 @@ import datetime as dt
 from bson import ObjectId
 
 
-
 class Follower(MongoDBModel):
     coll_name = "follower"
 

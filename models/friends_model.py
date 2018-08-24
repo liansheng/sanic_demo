@@ -37,3 +37,16 @@ class FriendModel(MongoDBModel):
             return True
         else:
             return False
+
+    async def remove(self, id1, id2):
+        """
+        remove friend relationship between id1 and id2
+        :param id1:
+        :param id2:
+        :return:
+        """
+        docs = await self.find(myself=ObjectId(id1), friend=ObjectId(id2))
+        count = len(docs)
+        if count == 1:
+            self.remove_by_id(docs[0]["_id"])
+        return True

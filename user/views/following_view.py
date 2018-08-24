@@ -109,6 +109,7 @@ class Follow(HTTPMethodView):
             if await self.follower_model.check_is_mutual_follow(login_user_id, following_user_id):
                 await self.friends_model.add(login_user_id, following_user_id)
                 await app.redis.rpush("{}_{}".format(login_user_id, "friends"), following_user_id)
+                await app.redis.rpush("{}_{}".format(following_user_id, "friends"), login_user_id)
 
             # 4 update or created follow redis
             await self.user_model.add_follow_count(login_user_id, following_user_id)
@@ -131,6 +132,7 @@ class UnFollow(HTTPMethodView):
         self.collection = app.mongo["account_center"].user
         self.user_model = UserModel(self.collection)
         self.follower_model = Follower(app.mongo["account_center"].follower)
+        self.friends_model = FriendModel(app.mongo["account_center"].friends)
 
     # def get(self, request):
     #     # get logging user follow
@@ -152,7 +154,7 @@ class UnFollow(HTTPMethodView):
         assert following_user_id, "参数不能为空"
 
         # 1 check user id is real user
-        doc = await check_real_user_server.is_user(following_user_id, self.user_model)
+        await check_server.is_user(following_user_id, self.user_model)
 
         # 2 update or created follow relationship in mongo
         # count = self.follower_model.update_or_created_follow_relationship()
@@ -160,9 +162,13 @@ class UnFollow(HTTPMethodView):
         await  self.follower_model.delete_follow_relationship(login_user_id, following_user_id)
         if res is not "is_null":
             # if login id have not follow relationship. then inc following and followers count
-            # 3 update or created redis
+            # 3 delete friend relationship
+            await self.friends_model.remove(login_user_id, following_user_id)
+            await app.redis.lrem("{}_{}".format(login_user_id, "friends"), following_user_id)
+            await app.redis.lrem("{}_{}".format(following_user_id, "friends"), login_user_id)
+
+            # 4 update or created redis
             await self.user_model.sub_follow_count(login_user_id, following_user_id)
-            print("delete value ", following_user_id)
             await app.redis.lrem("{}_{}".format(login_user_id, "follower"), count=1, value=following_user_id)
 
         return json(response_package("200", {}))
