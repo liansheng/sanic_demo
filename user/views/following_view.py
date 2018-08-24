@@ -10,6 +10,7 @@ from sanic import Blueprint
 from sanic.response import text
 
 from obj.models.user_model import UserModel, Follower
+from obj.models.friends_model import FriendModel
 
 from sanic import Sanic
 from sanic.views import HTTPMethodView
@@ -17,13 +18,13 @@ from sanic.response import text, json
 from sanic.exceptions import ServerError
 from sanic_jwt.decorators import protected
 from obj.util.setting import app
-from obj.user.services.CheckServices import CheckRealUserServer
+from obj.user.services.CheckServices import CheckServer
 from bson import ObjectId
 from obj.util.responsePack import response_package
 
 user_bp = Blueprint("user", url_prefix="/api/v1")
 
-check_real_user_server = CheckRealUserServer()
+check_server = CheckServer()
 
 
 class SimpleView(HTTPMethodView):
@@ -75,6 +76,7 @@ class Follow(HTTPMethodView):
         self.collection = app.mongo["account_center"].user
         self.user_model = UserModel(self.collection)
         self.follower_model = Follower(app.mongo["account_center"].follower)
+        self.friends_model = FriendModel(app.mongo["account_center"].friends)
 
     # def get(self, request):
     #     # get logging user follow
@@ -96,14 +98,19 @@ class Follow(HTTPMethodView):
         assert following_user_id, "参数不能为空"
 
         # 1 check user id is real user
-        doc = await check_real_user_server.is_user(following_user_id, self.user_model)
+        await check_server.is_user(following_user_id, self.user_model)
 
         # 2 update or created follow relationship in mongo
         # count = self.follower_model.update_or_created_follow_relationship()
         res = await self.follower_model.update_or_created_follow_relationship(login_user_id, following_user_id)
         if res is not "existed":
             # if login id have not follow relationship. then inc following and followers count
-            # 3 update or created redis
+            # 3 a->b check, a is <- b, then add friend relationship
+            if await self.follower_model.check_is_mutual_follow(login_user_id, following_user_id):
+                await self.friends_model.add(login_user_id, following_user_id)
+                await app.redis.rpush("{}_{}".format(login_user_id, "friends"), following_user_id)
+
+            # 4 update or created follow redis
             await self.user_model.add_follow_count(login_user_id, following_user_id)
             await app.redis.rpush("{}_{}".format(login_user_id, "follower"), following_user_id)
 

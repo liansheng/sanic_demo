@@ -14,6 +14,7 @@ import datetime as dt
 from bson import ObjectId
 
 
+
 class Follower(MongoDBModel):
     coll_name = "follower"
 
@@ -69,6 +70,20 @@ class Follower(MongoDBModel):
             return True
         except Exception as e:
             raise AssertionError("关注失败")
+
+    async def check_is_mutual_follow(self, id_1, id_2):
+        """
+        :param id_1:
+        :param id_2:
+        :return:  True | False
+        """
+        res = await self.find(myself=ObjectId(id_1), following=ObjectId(id_2))
+        if len(res) == 0:
+            return False
+        second = await self.find(myself=ObjectId(id_2), following=ObjectId(id_1))
+        if len(second) == 0:
+            return False
+        return True
 
     async def add_follow(self, id_1, id_2):
         """

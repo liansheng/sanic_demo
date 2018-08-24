@@ -11,7 +11,7 @@ from obj.models.user_model import UserModel
 from obj.util.setting import app
 
 
-class CheckRealUserServer:
+class CheckServer:
 
     def is_real_id(self, user_id):
         try:
