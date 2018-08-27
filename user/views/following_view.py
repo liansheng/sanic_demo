@@ -108,12 +108,12 @@ class Follow(HTTPMethodView):
             # 3 a->b check, a is <- b, then add friend relationship
             if await self.follower_model.check_is_mutual_follow(login_user_id, following_user_id):
                 await self.friends_model.add(login_user_id, following_user_id)
-                await app.redis.rpush("{}_{}".format(login_user_id, "friends"), following_user_id)
-                await app.redis.rpush("{}_{}".format(following_user_id, "friends"), login_user_id)
+                await app.redis.sadd("{}_{}".format(login_user_id, "friends"), following_user_id)
+                await app.redis.sadd("{}_{}".format(following_user_id, "friends"), login_user_id)
 
             # 4 update or created follow redis
             await self.user_model.add_follow_count(login_user_id, following_user_id)
-            await app.redis.rpush("{}_{}".format(login_user_id, "follower"), following_user_id)
+            await app.redis.sadd("{}_{}".format(login_user_id, "follower"), following_user_id)
 
         return json(response_package("200", {}))
 
@@ -164,12 +164,12 @@ class UnFollow(HTTPMethodView):
             # if login id have not follow relationship. then inc following and followers count
             # 3 delete friend relationship
             await self.friends_model.remove(login_user_id, following_user_id)
-            await app.redis.lrem("{}_{}".format(login_user_id, "friends"), following_user_id)
-            await app.redis.lrem("{}_{}".format(following_user_id, "friends"), login_user_id)
+            await app.redis.srem("{}_{}".format(login_user_id, "friends"), following_user_id)
+            await app.redis.srem("{}_{}".format(following_user_id, "friends"), login_user_id)
 
             # 4 update or created redis
             await self.user_model.sub_follow_count(login_user_id, following_user_id)
-            await app.redis.lrem("{}_{}".format(login_user_id, "follower"), count=1, value=following_user_id)
+            await app.redis.srem("{}_{}".format(login_user_id, "follower"), count=1, value=following_user_id)
 
         return json(response_package("200", {}))
 
