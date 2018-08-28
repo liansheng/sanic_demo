@@ -24,10 +24,12 @@ from obj.user.services.CheckServices import CheckServer
 from bson import ObjectId
 from obj.util.responsePack import response_package
 from obj.util.tools import get_user_id_by_request
+from obj.user.services.WriteServices import WriteModelServer
 
 user_bp = Blueprint("user", url_prefix="/api/v1")
 
 check_server = CheckServer()
+write_model_server = WriteModelServer()
 
 
 class SimpleView(HTTPMethodView):
@@ -107,6 +109,8 @@ class Follow(HTTPMethodView):
 
         # 2 update or created follow relationship in mongo
         # count = self.follower_model.update_or_created_follow_relationship()
+        # write follower collection server
+        await write_model_server.write_follower_relationship(self.follower_model, self.user_model, login_user_id, following_user_id)
         res = await self.follower_model.update_or_created_follow_relationship(login_user_id, following_user_id)
         if res is not "existed":
             # if login id have not follow relationship. then inc following and followers count

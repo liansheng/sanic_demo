@@ -93,3 +93,8 @@ class MongoDBModel(BaseModel):
 
     def inc_field_by_user_id(self, user_id, field, number):
         self.collection.update_one({"_id": ObjectId(user_id)}, {"$inc": {field: number}})
+
+    async def trans_obj_id(self, obj):
+        if "_id" in obj.keys():
+            obj["id"] = str(obj.pop("_id"))
+        return obj
