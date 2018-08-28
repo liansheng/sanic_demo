@@ -17,10 +17,13 @@ from sanic.views import HTTPMethodView
 from sanic.response import text, json
 from sanic.exceptions import ServerError
 from sanic_jwt.decorators import protected
+
+from obj.user.views.search_view import SearchUser
 from obj.util.setting import app
 from obj.user.services.CheckServices import CheckServer
 from bson import ObjectId
 from obj.util.responsePack import response_package
+from obj.util.tools import get_user_id_by_request
 
 user_bp = Blueprint("user", url_prefix="/api/v1")
 
@@ -72,6 +75,8 @@ class SimpleView2(HTTPMethodView):
 
 
 class Follow(HTTPMethodView):
+    decorators = [protected()]
+
     def __init__(self):
         self.collection = app.mongo["account_center"].user
         self.user_model = UserModel(self.collection)
@@ -92,7 +97,7 @@ class Follow(HTTPMethodView):
         :return:
         """
         # param check
-        login_user_id = request.cookies.get("user_id", None)
+        login_user_id = await get_user_id_by_request(request)
         assert login_user_id, "当前没有用户登录"
         following_user_id = request.json.get("following_user_id", None)
         assert following_user_id, "参数不能为空"
@@ -128,6 +133,8 @@ class Follow(HTTPMethodView):
 
 
 class UnFollow(HTTPMethodView):
+    decorators = [protected()]
+
     def __init__(self):
         self.collection = app.mongo["account_center"].user
         self.user_model = UserModel(self.collection)
@@ -176,3 +183,4 @@ class UnFollow(HTTPMethodView):
 
 user_bp.add_route(Follow.as_view(), "/user/follow")
 user_bp.add_route(UnFollow.as_view(), "/user/un_follow")
+user_bp.add_route(SearchUser.as_view(), "/user/search")

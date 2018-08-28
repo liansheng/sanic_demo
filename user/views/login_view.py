@@ -84,9 +84,12 @@ class MyAuthentication(Authentication):
         await self.app.redis.set(key, refresh_token)
 
     async def retrieve_refresh_token(self, user_id, *args, **kwargs):
+        print("retrieve_refresh_token....................................")
         key = "refresh_token_{user_id}".format(user_id=user_id)
         # token = self.app.my_cache.get(key, None)
         token = await self.app.redis.get(key)
+        print("key is ", key)
+        print("token is ", token)
         return token
 
     async def retrieve_user(self, request, payload, *args, **kwargs):
@@ -95,9 +98,17 @@ class MyAuthentication(Authentication):
         print("retrieve_user payload is ", payload)
         if payload:
             user_id = payload.get("user_id", None)
+            if user_id is None:
+                raise exceptions.AuthenticationFailed()
             docs = await user_model.find_by_id(user_id)
             print("docs : ", docs)
-            return response_package("200", UserLoginAfter(**docs).to_dict())
+            # return response_package("200", UserLoginAfter(**docs).to_dict())
+            return UserLoginAfter(**docs).to_dict()
             # return {"user_id": user_id}
         else:
             return response_package("401", {"user_id": None})
+
+    async def logout(self, user_id, *args, **kwargs):
+        key = "refresh_token_{user_id}".format(user_id=user_id)
+        await self.app.redis.delete(key)
+        return True

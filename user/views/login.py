@@ -56,6 +56,7 @@ class MyAuthenticateEndpoint(BaseEndpoint):
             refresh_token=refresh_token,
             config=self.config,
         )
+        resp.cookies["user_id"] = user.get("user_id", None)
         await self.send_login_info_to_kafka(user)
         return await self.do_response(resp)
 

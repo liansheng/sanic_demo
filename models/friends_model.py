@@ -20,6 +20,7 @@ class FriendModel(MongoDBModel):
     async def add(self, id1, id2):
         """
         add friend relationship between id and id2
+        id1 following id2
         :param id1:
         :param id2:
         :return:
@@ -27,11 +28,11 @@ class FriendModel(MongoDBModel):
         if await self.check_is_friend(id1, id2):
             return True
         else:
-            await self.create({"myself": ObjectId(id1), "friend": ObjectId(id2)})
+            await self.create({"myself": id1, "friend": id2})
         return True
 
     async def check_is_friend(self, id1, id2):
-        docs = await self.find(myself=ObjectId(id1), friend=ObjectId(id2))
+        docs = await self.find(myself=id1, friend=id2)
         count = len(docs)
         if count == 1:
             return True
@@ -45,7 +46,7 @@ class FriendModel(MongoDBModel):
         :param id2:
         :return:
         """
-        docs = await self.find(myself=ObjectId(id1), friend=ObjectId(id2))
+        docs = await self.find(myself=id1, friend=id2)
         count = len(docs)
         if count == 1:
             self.remove_by_id(docs[0]["_id"])

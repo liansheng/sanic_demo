@@ -183,7 +183,7 @@ class UserLoginAfter:
 
     def trans_id(self, res):
         if "_id" in res:
-            res["id"] = res.pop("_id")
+            res["user_id"] = res.pop("_id")
         return res
 
 

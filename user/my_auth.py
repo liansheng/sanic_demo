@@ -12,19 +12,19 @@ from obj.util.globals import r
 from sanic import response
 from sanic.response import json
 
-
-class User:
-
-    def __init__(self, id, username, password):
-        self.user_id = id
-        self.username = username
-        self.password = password
-
-    def __repr__(self):
-        return "User(id='{}')".format(self.user_id)
-
-    def to_dict(self):
-        return {"user_id": self.user_id, "username": self.username}
+#
+# class User:
+#
+#     def __init__(self, id, username, password):
+#         self.user_id = id
+#         self.username = username
+#         self.password = password
+#
+#     def __repr__(self):
+#         return "User(id='{}')".format(self.user_id)
+#
+#     def to_dict(self):
+#         return {"user_id": self.user_id, "username": self.username}
         # properties = ['user_id', 'username', 'email', 'verified']
         # return {prop: getattr(self, prop, None) for prop in properties}
 

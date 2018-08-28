@@ -47,7 +47,12 @@ class MongoDBModel(BaseModel):
         return docs
 
     def find_list(self, *args, **kwargs):
+        print("kw is ", kwargs)
         docs = self.collection.find(kwargs)
+        return docs
+
+    def raw_find(self, obj):
+        docs = self.collection.find(obj)
         return docs
 
     def find_one(self, **kwargs):

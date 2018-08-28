@@ -7,6 +7,7 @@
 """
 from obj.user.check_common_mothed import validate_phone, validate_must
 from marshmallow import Schema, fields, validates, ValidationError, validate
+from bson import ObjectId
 
 E = {
     'required': '参数是必须的',
@@ -24,3 +25,24 @@ class UserResisterSchema(Schema):
 class RegisterPhoneSchema(Schema):
     # registered_phone = fields.Str(validate=[validate_phone], required=True, error_messages=E)
     registered_phone = fields.Str(validate=[validate_phone])
+
+
+class FansSchema(Schema):
+    following = fields.Str()
+
+
+class FollowingSchema(Schema):
+    myself = fields.Str()
+
+
+class FriendSchema(Schema):
+    pass
+
+
+if __name__ == '__main__':
+    data_list = [{'_id': ObjectId('5b84e5e15f627dac33233cb2'), 'myself': '5b7cfbd45f627ddd88e2c929',
+                  'following': '5b7e29dd5f627d0218528819'}]
+    schema = FansSchema(many=True)
+    result = schema.load(data_list)
+    print(dir(result))
+    print(result.data)

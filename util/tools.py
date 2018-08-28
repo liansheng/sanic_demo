@@ -8,6 +8,7 @@
 import random
 import string
 from functools import wraps
+from sanic_jwt import utils
 
 
 def format_res(obj):
@@ -79,6 +80,15 @@ def exeTime(func):
         return back
 
     return newFunc
+
+
+async def get_user_id_by_request(request):
+    payload = request.app.auth.extract_payload(request, verify=False)
+    user = await utils.call(
+        request.app.auth.retrieve_user, request, payload=payload
+    )
+    user_id = await request.app.auth._get_user_id(user)
+    return user_id
 
 
 if __name__ == '__main__':

@@ -23,7 +23,7 @@ class Follower(MongoDBModel):
         :param user_id:
         :return: 关注数量
         """
-        following_list = await self.find({"myself": ObjectId(user_id)})
+        following_list = await self.find({"myself": user_id})
         return following_list.count()
 
     async def find_followers_count_by_user_id(self, user_id):
@@ -41,7 +41,7 @@ class Follower(MongoDBModel):
         :param id_2:
         :return:
         """
-        following_list = await self.find(myself=ObjectId(id_1), following=ObjectId(id_2))
+        following_list = await self.find(myself=id_1, following=id_2)
         count = len(following_list)
         if count == 1:
             self.remove_by_id(following_list[0]["_id"])
@@ -59,13 +59,13 @@ class Follower(MongoDBModel):
         try:
             # print("myself id ", id_1, "following id ", id_2)
             # following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
-            following_list = await self.find(myself=ObjectId(id_1), following=ObjectId(id_2))
+            following_list = await self.find(myself=id_1, following=id_2)
             # print("following_list os ", following_list)
             count = len(following_list)
             if count == 1:
                 return "existed"
             else:
-                await self.create({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
+                await self.create({"myself": id_1, "following": id_2})
             return True
         except Exception as e:
             raise AssertionError("关注失败")
@@ -76,10 +76,10 @@ class Follower(MongoDBModel):
         :param id_2:
         :return:  True | False
         """
-        res = await self.find(myself=ObjectId(id_1), following=ObjectId(id_2))
+        res = await self.find(myself=id_1, following=id_2)
         if len(res) == 0:
             return False
-        second = await self.find(myself=ObjectId(id_2), following=ObjectId(id_1))
+        second = await self.find(myself=id_2, following=id_1)
         if len(second) == 0:
             return False
         return True

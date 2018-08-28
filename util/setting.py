@@ -23,7 +23,7 @@ from kafka import KafkaProducer, KafkaConsumer
 from obj.util.config import kafka_host
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import sys
-from obj.util.config import BASE_DIR, REDIS_CONFIG
+from obj.util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG
 
 app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)
@@ -35,9 +35,9 @@ app.static('/static', os.path.join(BASE_DIR, "static"))
 # app.debug = False
 
 mongo_uri = "mongodb://{host}:{port}/{database}".format(
-    database='account_center',
-    port=27017,
-    host='localhost'
+    database=DATABASE_CONFIG["name"],
+    port=DATABASE_CONFIG["port"],
+    host=DATABASE_CONFIG["host"]
 )
 Mongo.SetConfig(app, account_center=mongo_uri)
 Mongo(app)
@@ -112,33 +112,10 @@ async def after_server(app, loop):
         group_id="my-group4343")
     await app.consumer.start()
     await process(app.consumer)
+    # init redis follower and friend relationship
+
     # async for msg in app.consumer:
     #     print("consumed: ", msg.topic, msg.partition, msg.offset,
     #           msg.key, msg.value, msg.timestamp)
     # loop.run_until_complete(consume(loop))
 
-
-DATABASE_CONIFG = {
-    "host": "localhost",
-    "port": 27017,
-    "name": "account_center",
-}
-
-secret = "F%^%$%czx76$%^a"
-
-# INITIALIZE_CONFIG = {
-#     # "authenticate": authenticate,
-#     # "path_to_authenticate": '/login',
-#     # "cookie_domain": "sendMe.com",
-#     # "cookie_set": True,
-#     'expiration_delta': 60 * 30,
-#     # "retrieve_user": retrieve_user,
-#     'debug': True,
-#     # "extend_payload": my_extender,
-#
-#     # payload
-#     "claim_aud": "sendMe.com",
-#     "claim_iat": True,
-#     "claim_iss": 'ls',
-#     "secret": secret,
-# }
