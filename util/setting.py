@@ -24,6 +24,7 @@ from obj.util.config import kafka_host
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import sys
 from obj.util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG
+from obj.util.server_init.init_reids import InitRedis
 
 app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)
@@ -101,18 +102,28 @@ async def server_init(app, loop):
 
 @app.listener("after_server_start")
 async def after_server(app, loop):
+    print("begin after server start...")
     app.consumer = AIOKafkaConsumer(
         'user',
         loop=loop, bootstrap_servers=kafka_host,
         group_id="my-group4343")
-    await app.consumer.start()
-    await process(app.consumer)
+
+    # self.collection = app.mongo["account_center"].user
+    # self.user_model = UserModel(self.collection)
+
+    init_redis = InitRedis(app.redis, UserModel(app.mongo["account_center"].user))
+    await init_redis.init_user_info_to_redis()
     # init redis follower and friend relationship
+
+    # init user info to redis
 
     # async for msg in app.consumer:
     #     print("consumed: ", msg.topic, msg.partition, msg.offset,
     #           msg.key, msg.value, msg.timestamp)
     # loop.run_until_complete(consume(loop))
+    await app.consumer.start()
+    await process(app.consumer)
+    print("finish  server init...")
 
 
 @app.listener("after_server_stop")
