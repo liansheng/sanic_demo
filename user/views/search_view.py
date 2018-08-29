@@ -54,10 +54,9 @@ class SearchUser(HTTPMethodView):
         model = self.MAPPING[data["type"]]
         schema = self.SchemaMapping[data["type"]]
         data_list = await search_service.search_user(model, data)
-        res_data = schema(many=True).load(data_list).data
+        res_data = schema(many=True).dump(data_list).data
         print("data_list is ", data_list)
         print("res_data is ", res_data)
         # data_list, need serializers
-
         return response.json(response_package("200", {"data_info": res_data}))
         pass

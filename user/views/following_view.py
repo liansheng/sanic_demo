@@ -16,7 +16,7 @@ from sanic import Sanic
 from sanic.views import HTTPMethodView
 from sanic.response import text, json
 from sanic.exceptions import ServerError
-from sanic_jwt.decorators import protected
+from sanic_jwt.decorators import protected, inject_user
 
 from obj.user.views.search_view import SearchUser
 from obj.util.setting import app
@@ -58,6 +58,7 @@ class SimpleView(HTTPMethodView):
 class SimpleView2(HTTPMethodView):
     decorators = [protected()]
 
+    # @inject_user()
     def get(self, request):
         print(dir(request))
         print(request.args)
@@ -99,6 +100,7 @@ class Follow(HTTPMethodView):
         :return:
         """
         # param check
+        # print(" user_id ", user.user_id)
         login_user_id = await get_user_id_by_request(request)
         assert login_user_id, "当前没有用户登录"
         following_user_id = request.json.get("following_user_id", None)
@@ -110,22 +112,22 @@ class Follow(HTTPMethodView):
         # 2 update or created follow relationship in mongo
         # count = self.follower_model.update_or_created_follow_relationship()
         # write follower collection server
-        await write_model_server.write_follower_relationship(app, self.follower_model, self.user_model, login_user_id,
-                                                             following_user_id)
-        res = await self.follower_model.update_or_created_follow_relationship(login_user_id, following_user_id)
-        if res is not "existed":
-            # if login id have not follow relationship. then inc following and followers count
-            # 3 a->b check, a is <- b, then add friend relationship
-            if await self.follower_model.check_is_mutual_follow(login_user_id, following_user_id):
-                await self.friends_model.add(login_user_id, following_user_id)
-                await app.redis.sadd("{}_{}".format(login_user_id, "friends"), following_user_id)
-                await app.redis.sadd("{}_{}".format(following_user_id, "friends"), login_user_id)
-
-            # 4 update or created follow redis
-            await self.user_model.add_follow_count(login_user_id, following_user_id)
-            if isinstance(following_user_id, bytes):
-                following_user_id = following_user_id.decode()
-            await app.redis.sadd("{}_{}".format(login_user_id, "follower"), following_user_id)
+        await write_model_server.write_follower_relationship(app, self.follower_model, self.user_model,
+                                                             self.friends_model, login_user_id, following_user_id)
+        # res = await self.follower_model.update_or_created_follow_relationship_by_data(login_user_id, following_user_id)
+        # if res is not "existed":
+        #     # if login id have not follow relationship. then inc following and followers count
+        #     # 3 a->b check, a is <- b, then add friend relationship
+        #     if await self.follower_model.check_is_mutual_follow(login_user_id, following_user_id):
+        #         await self.friends_model.add(login_user_id, following_user_id)
+        #         await app.redis.sadd("{}_{}".format(login_user_id, "friends"), following_user_id)
+        #         await app.redis.sadd("{}_{}".format(following_user_id, "friends"), login_user_id)
+        #
+        #     # 4 update or created follow redis
+        #     await self.user_model.add_follow_count(login_user_id, following_user_id)
+        #     if isinstance(following_user_id, bytes):
+        #         following_user_id = following_user_id.decode()
+        #     await app.redis.sadd("{}_{}".format(login_user_id, "follower"), following_user_id)
 
         return json(response_package("200", {}))
 
@@ -172,18 +174,21 @@ class UnFollow(HTTPMethodView):
 
         # 2 update or created follow relationship in mongo
         # count = self.follower_model.update_or_created_follow_relationship()
-        res = await self.follower_model.update_or_created_follow_relationship(login_user_id, following_user_id)
-        await  self.follower_model.delete_follow_relationship(login_user_id, following_user_id)
-        if res is not "is_null":
-            # if login id have not follow relationship. then inc following and followers count
-            # 3 delete friend relationship
-            await self.friends_model.remove(login_user_id, following_user_id)
-            await app.redis.srem("{}_{}".format(login_user_id, "friends"), following_user_id)
-            await app.redis.srem("{}_{}".format(following_user_id, "friends"), login_user_id)
+        await write_model_server.write_unfollower_relationship(app, self.follower_model, self.user_model,
+                                                               self.friends_model, login_user_id, following_user_id)
 
-            # 4 update or created redis
-            await self.user_model.sub_follow_count(login_user_id, following_user_id)
-            await app.redis.srem("{}_{}".format(login_user_id, "follower"), count=1, value=following_user_id)
+        # res = await self.follower_model.update_or_created_follow_relationship(login_user_id, following_user_id)
+        # await  self.follower_model.delete_follow_relationship(login_user_id, following_user_id)
+        # if res is not "is_null":
+        #     # if login id have not follow relationship. then inc following and followers count
+        #     # 3 delete friend relationship
+        #     await self.friends_model.remove(login_user_id, following_user_id)
+        #     await app.redis.srem("{}_{}".format(login_user_id, "friends"), following_user_id)
+        #     await app.redis.srem("{}_{}".format(following_user_id, "friends"), login_user_id)
+        #
+        #     # 4 update or created redis
+        #     await self.user_model.sub_follow_count(login_user_id, following_user_id)
+        #     await app.redis.srem("{}_{}".format(login_user_id, "follower"), count=1, value=following_user_id)
 
         return json(response_package("200", {}))
 

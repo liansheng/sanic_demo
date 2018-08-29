@@ -76,7 +76,6 @@ async def print_on_response(request, response):
 i = initialize(
     app,
     refresh_token_enabled=True,
-    # verify_exp=False,
     class_views=(('/register', Register), ("/check_phone", CheckRegisteredParm),
                  ("/login", MyAuthenticateEndpoint), ("/logout", LogoutEndpoint),
                  ("/refresh_token", MyRefreshEndpoint)),

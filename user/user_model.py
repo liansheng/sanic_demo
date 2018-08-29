@@ -29,7 +29,9 @@ class RegisterPhoneSchema(Schema):
 
 
 class FansSchema(Schema):
-    following = fields.Str()
+    user_name = fields.Str(attribute="myself_name")
+    user_id = fields.Str(attribute="myself_user_id")
+    user_head_portrait = fields.Str(attribute="myself_head_portrait")
 
 
 class FollowingSchema(Schema):
@@ -54,8 +56,14 @@ class WriteSelfFollowInfoSchema(Schema):
 
 class WriteFollowingFollowInfoSchema(Schema):
     name = fields.Str(attribute="following_name", required=True)
-    head_portrait = fields.Str(attribute="following_hsead_portrait", required=True)
+    head_portrait = fields.Str(attribute="following_head_portrait", required=True)
     id = fields.Str(attribute="following_user_id", required=True)
+
+
+class WriteFriendSchema(Schema):
+    name = fields.Str(attribute="friend_name", required=True)
+    head_portrait = fields.Str(attribute="friend_head_portrait", required=True)
+    id = fields.Str(attribute="friend_user_id", required=True)
 
 
 def test1():
@@ -102,4 +110,17 @@ if __name__ == '__main__':
     # result = schema.load(data_list)
     # print(dir(result))
     # print(result.data)
-    test1()
+    # test1()
+    data_list = [{'_id': ObjectId('5b86463e5f627dede7c00731'), 'myself_name': 'fawoaKNNgOTx',
+                   'myself_user_id': '5b7e29dd5f627d0218528819',
+                   'myself_head_portrait': '/static/img/default_head_portrait.jpg', 'following_name': 'fawoM7zemXN7',
+                   'following_user_id': '5b7cfbd45f627ddd88e2c929',
+                   'following_head_portrait': '/static/img/default_head_portrait.png'}]
+    schema = FansSchema(many=True)
+    result = schema.load(data_list)
+    print(result.data)
+
+    data = data_list[0]
+    r = FansSchema().dump(data)
+    print(r.data)
+

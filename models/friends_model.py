@@ -7,6 +7,7 @@
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+from pypinyin import lazy_pinyin
 
 from obj.util.mongo_model.model import MongoDBModel
 from sanic.exceptions import SanicException
@@ -17,23 +18,45 @@ from bson import ObjectId
 class FriendModel(MongoDBModel):
     coll_name = "friend"
 
-    async def add(self, id1, id2):
+    # async def add(self, id1, id2):
+    #     """
+    #     add friend relationship between id and id2
+    #     id1 following id2
+    #     :param id1:
+    #     :param id2:
+    #     :return:
+    #     """
+    #     if await self.check_is_friend(id1, id2):
+    #         return True
+    #     else:
+    #         await self.create({"myself": id1, "friend": id2})
+    #     return True
+
+    async def add_data(self, data1, data2):
         """
         add friend relationship between id and id2
         id1 following id2
-        :param id1:
-        :param id2:
+        :param data1: {'myself_head_portrait': '/static/img/default_head_portrait.jpg',
+                'myself_name': 'fawoaKNNgOTx', 'myself_user_id': '5b7e29dd5f627d0218528819'}
+        :param data2: {'friend_head_portrait': '/static/img/default_head_portrait.png',
+                'friend_name': 'fawoM7zemXN7', 'friend_user_id': '5b7cfbd45f627ddd88e2c929'}
         :return:
         """
-        if await self.check_is_friend(id1, id2):
+        if await self.check_is_friend(data1["myself_user_id"], data2['friend_user_id']):
             return True
         else:
-            await self.create({"myself": id1, "friend": id2})
+            data1.update(data2)
+            await self.create(data1)
         return True
 
     async def check_is_friend(self, id1, id2):
-        docs = await self.find(myself=id1, friend=id2)
-        count = len(docs)
+        """
+        check two people are friends
+        :param id1:
+        :param id2:
+        :return: friends is True, not a friends is False
+        """
+        count = await self.collection.count_documents({"myself_user_id": id1, "friend_user_id": id2})
         if count == 1:
             return True
         else:
@@ -46,8 +69,14 @@ class FriendModel(MongoDBModel):
         :param id2:
         :return:
         """
-        docs = await self.find(myself=id1, friend=id2)
+        docs = await self.find(myself_user_id=id1, friend_user_id=id2)
         count = len(docs)
         if count == 1:
             self.remove_by_id(docs[0]["_id"])
         return True
+
+    async def find_friends_by_name_and_user_id(self, user_id, offset, key_words="", page_size=20):
+        docs = await self.collection.find(
+            {"friend_name": {'$regex': key_words}, 'myself_user_id': user_id}
+        ).skip(offset).to_list(page_size)
+        return docs

@@ -17,6 +17,7 @@ from obj.user.check_common_mothed import gen_password
 
 
 class MyAuthentication(Authentication):
+    expiration_delta = 60 * 100
 
     # def __init__(self, *args, **kwargs):
     #     super(MyAuthentication, self).__init__(*args, **kwargs)

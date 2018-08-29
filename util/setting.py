@@ -80,12 +80,6 @@ async def process(consumer):
               msg.key, msg.value, msg.timestamp)
 
 
-@app.listener("after_server_stop")
-async def server_stop(app, loop):
-    app.redis.close()
-    await app.redis.wait_closed()
-
-
 @app.listener('before_server_start')
 async def server_init(app, loop):
     app.redis = await aioredis.create_redis_pool(app.config['redis'])
@@ -120,3 +114,8 @@ async def after_server(app, loop):
     #           msg.key, msg.value, msg.timestamp)
     # loop.run_until_complete(consume(loop))
 
+
+@app.listener("after_server_stop")
+async def server_stop(app, loop):
+    app.redis.close()
+    await app.redis.wait_closed()

@@ -50,26 +50,26 @@ class Follower(MongoDBModel):
         else:
             return "is_null"
 
-    async def update_or_created_follow_relationship(self, id_1, id_2):
-        """
-        id1 following id2
-        :param id_1:
-        :param id_2:
-        :return:
-        """
-        try:
-            # print("myself id ", id_1, "following id ", id_2)
-            # following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
-            following_list = await self.find(myself_user_id=id_1, following_user_id=id_2)
-            # print("following_list os ", following_list)
-            count = len(following_list)
-            if count == 1:
-                return "existed"
-            else:
-                await self.create({"myself_user_id": id_1, "following_user_id": id_2})
-            return True
-        except Exception as e:
-            raise AssertionError("关注失败")
+    # async def update_or_created_follow_relationship(self, id_1, id_2):
+    #     """
+    #     id1 following id2
+    #     :param id_1:
+    #     :param id_2:
+    #     :return:
+    #     """
+    #     try:
+    #         # print("myself id ", id_1, "following id ", id_2)
+    #         # following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
+    #         following_list = await self.find(myself_user_id=id_1, following_user_id=id_2)
+    #         # print("following_list os ", following_list)
+    #         count = len(following_list)
+    #         if count == 1:
+    #             return "existed"
+    #         else:
+    #             await self.create({"myself_user_id": id_1, "following_user_id": id_2})
+    #         return True
+    #     except Exception as e:
+    #         raise AssertionError("关注失败")
 
     async def update_or_created_follow_relationship_by_data(self, data1, data2):
         """
@@ -83,9 +83,8 @@ class Follower(MongoDBModel):
         try:
             # print("myself id ", id_1, "following id ", id_2)
             # following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
-            count = await self.find_list(myself_user_id=data1["myself_user_id"],
-                                         following_user_id=data2["following_user_id"]).count()
-            # print("following_list os ", following_list)
+            count = await self.collection.count_documents(filter={"myself_user_id": data1["myself_user_id"],
+                                                                  "following_user_id": data2["following_user_id"]})
             if count == 1:
                 return "existed"
             else:
@@ -93,7 +92,7 @@ class Follower(MongoDBModel):
                 await self.create(data1)
             return True
         except Exception as e:
-            raise AssertionError("关注失败")
+            raise AssertionError("关注失败", str(e))
 
     async def check_is_mutual_follow(self, id_1, id_2):
         """
@@ -101,13 +100,43 @@ class Follower(MongoDBModel):
         :param id_2:
         :return:  True | False
         """
-        res = await self.find_list(myself_user_id=id_1, following_user_id=id_2).count()
-        if res == 0:
+        first = await self.collection.count_documents({"myself_user_id": id_1, "following_user_id": id_2})
+        # res = await self.find_list(myself_user_id=id_1, following_user_id=id_2).count()
+        if first == 0:
             return False
-        second = await self.find_list(myself_user_id=id_2, following_user_id=id_1).count()
+        second = await self.collection.count_documents({"following_user_id": id_1, "myself_user_id": id_2})
+        # second = await self.find_list(myself_user_id=id_2, following_user_id=id_1).count()
         if second == 0:
             return False
         return True
+
+    async def find_following_by_name_and_user_id(self, user_id, offset, key_words="", page_size=20):
+        """
+        search user_id's following
+        :param user_id:
+        :param offset:
+        :param key_words:
+        :param page_size:
+        :return:
+        """
+        docs = await self.collection.find(
+            {"following_name": {'$regex': key_words}, 'myself_user_id': user_id}
+        ).skip(offset).to_list(page_size)
+        return docs
+
+    async def find_followers_by_name_and_user_id(self, user_id, offset, key_words="", page_size=20):
+        """
+        search user_id's fans
+        :param user_id:
+        :param offset:
+        :param key_words:
+        :param page_size:
+        :return:
+        """
+        docs = await self.collection.find(
+            {"myself_name": {'$regex': key_words, '$options': 'i'}, 'following_user_id': user_id}
+        ).skip(offset).to_list(page_size)
+        return docs
 
     async def add_follow(self, id_1, id_2):
         """
