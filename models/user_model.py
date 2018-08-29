@@ -23,7 +23,7 @@ class Follower(MongoDBModel):
         :param user_id:
         :return: 关注数量
         """
-        following_list = await self.find({"myself": user_id})
+        following_list = await self.find_list({"myself_user_id": user_id})
         return following_list.count()
 
     async def find_followers_count_by_user_id(self, user_id):
@@ -32,7 +32,8 @@ class Follower(MongoDBModel):
         :param user_id:
         :return: 粉丝数量
         """
-        pass
+        following_list = await self.find_list({"following_user_id": user_id})
+        return following_list.count()
 
     async def delete_follow_relationship(self, id_1, id_2):
         """
@@ -41,7 +42,7 @@ class Follower(MongoDBModel):
         :param id_2:
         :return:
         """
-        following_list = await self.find(myself=id_1, following=id_2)
+        following_list = await self.find(myself_user_id=id_1, following_user_id=id_2)
         count = len(following_list)
         if count == 1:
             self.remove_by_id(following_list[0]["_id"])
@@ -59,13 +60,37 @@ class Follower(MongoDBModel):
         try:
             # print("myself id ", id_1, "following id ", id_2)
             # following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
-            following_list = await self.find(myself=id_1, following=id_2)
+            following_list = await self.find(myself_user_id=id_1, following_user_id=id_2)
             # print("following_list os ", following_list)
             count = len(following_list)
             if count == 1:
                 return "existed"
             else:
-                await self.create({"myself": id_1, "following": id_2})
+                await self.create({"myself_user_id": id_1, "following_user_id": id_2})
+            return True
+        except Exception as e:
+            raise AssertionError("关注失败")
+
+    async def update_or_created_follow_relationship_by_data(self, data1, data2):
+        """
+        id1 following id2
+        :param data1: {'myself_head_portrait': '/static/img/default_head_portrait.jpg',
+                'myself_name': 'fawoaKNNgOTx', 'myself_user_id': '5b7e29dd5f627d0218528819'}
+        :param data2: {'following_hsead_portrait': '/static/img/default_head_portrait.png',
+                'following_name': 'fawoM7zemXN7', 'following_user_id': '5b7cfbd45f627ddd88e2c929'}
+        :return:
+        """
+        try:
+            # print("myself id ", id_1, "following id ", id_2)
+            # following_list = await self.find({"myself": ObjectId(id_1), "following": ObjectId(id_2)})
+            count = await self.find_list(myself_user_id=data1["myself_user_id"],
+                                         following_user_id=data2["following_user_id"]).count()
+            # print("following_list os ", following_list)
+            if count == 1:
+                return "existed"
+            else:
+                data1.update(data2)
+                await self.create(data1)
             return True
         except Exception as e:
             raise AssertionError("关注失败")
@@ -76,11 +101,11 @@ class Follower(MongoDBModel):
         :param id_2:
         :return:  True | False
         """
-        res = await self.find(myself=id_1, following=id_2)
-        if len(res) == 0:
+        res = await self.find_list(myself_user_id=id_1, following_user_id=id_2).count()
+        if res == 0:
             return False
-        second = await self.find(myself=id_2, following=id_1)
-        if len(second) == 0:
+        second = await self.find_list(myself_user_id=id_2, following_user_id=id_1).count()
+        if second == 0:
             return False
         return True
 
@@ -94,6 +119,7 @@ class Follower(MongoDBModel):
         :param id_2:
         :return:
         """
+        pass
 
 
 class UserModel(MongoDBModel):

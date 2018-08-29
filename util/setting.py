@@ -49,8 +49,9 @@ async def process_exception(request, exception):
     status_code = str(getattr(exception, "status_code", "500"))
     # return json(response_package(status_code, exception.args))
     print(exception.args)
+    message = format_res(exception.args)
     return response.json(
-        response_package(str(status_code), results=str(exception.args), message=format_res(exception.args)))
+        response_package(str(status_code), results=str(exception.args), message=message))
     # return json(response_package(str(status_code), results=exception.args))
 
 

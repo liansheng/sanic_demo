@@ -19,6 +19,7 @@ from obj.user.views.login import MyAuthenticateEndpoint
 from obj.user.views.login_view import MyAuthentication
 from obj.user.views.registered_view import Register
 from obj.user.views.logout_view import LogoutEndpoint
+from obj.user.views.refresh_endpoint import MyRefreshEndpoint
 # from obj.util.kafka.producer import ProducerClient
 from obj.util.setting import app
 from sanic_jwt import utils
@@ -75,8 +76,10 @@ async def print_on_response(request, response):
 i = initialize(
     app,
     refresh_token_enabled=True,
+    # verify_exp=False,
     class_views=(('/register', Register), ("/check_phone", CheckRegisteredParm),
-                 ("/login", MyAuthenticateEndpoint), ("/logout", LogoutEndpoint)),
+                 ("/login", MyAuthenticateEndpoint), ("/logout", LogoutEndpoint),
+                 ("/refresh_token", MyRefreshEndpoint)),
     authentication_class=MyAuthentication,
     # cookie_domain="sendMe.com",
 )

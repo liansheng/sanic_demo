@@ -41,9 +41,21 @@ class FriendSchema(Schema):
 
 
 class WriteFollowInfoSchema(Schema):
-    name = fields.Str()
-    head_portrait = fields.Str()
-    id = fields.Str(data_key="user_id")
+    name = fields.Str(attribute="myself_name")
+    head_portrait = fields.Str(attribute="myself_head_portrait")
+    id = fields.Str(attribute="myself_user_id")
+
+
+class WriteSelfFollowInfoSchema(Schema):
+    name = fields.Str(attribute="myself_name", required=True)
+    head_portrait = fields.Str(attribute="myself_head_portrait", required=True)
+    id = fields.Str(attribute="myself_user_id", required=True)
+
+
+class WriteFollowingFollowInfoSchema(Schema):
+    name = fields.Str(attribute="following_name", required=True)
+    head_portrait = fields.Str(attribute="following_hsead_portrait", required=True)
+    id = fields.Str(attribute="following_user_id", required=True)
 
 
 def test1():
@@ -54,10 +66,9 @@ def test1():
             'gender': '未填写', 'head_portrait': '/static/img/default_head_portrait.jpg', 'is_add_id_card': False,
             'is_add_bus_card': False, 'last_logging_time': datetime.datetime(2018, 8, 28, 1, 37, 6, 100000),
             'bus_card_info': None, 'id_card_info': None, 'following_count': 1, 'followers_count': 3, 'friend_count': 0}
-    schema = WriteFollowInfoSchema()
+    schema = WriteFollowingFollowInfoSchema()
     result = schema.load(data)
     print(result.data)
-    print(schema.dump(data))
 
 
 def test2():
@@ -91,4 +102,4 @@ if __name__ == '__main__':
     # result = schema.load(data_list)
     # print(dir(result))
     # print(result.data)
-    test2()
+    test1()

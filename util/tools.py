@@ -12,6 +12,7 @@ from sanic_jwt import utils
 
 
 def format_res(obj):
+    print("obj is ", obj)
     if isinstance(obj, (list, tuple)) and isinstance(obj[0], (list, tuple)):
         l = []
         for tmp in obj:
@@ -27,7 +28,7 @@ def format_res(obj):
                 d[k] = " ".join(v)
         return " ".join(["{} {}".format(k, v) for k, v in d.items()])
     elif isinstance(obj, (list, tuple)):
-        return " ".join(obj)
+        return obj[0]
     elif isinstance(obj, dict):
         return " ".join(["{} {}".format(k, v) for k, v in obj.items()])
     else:
