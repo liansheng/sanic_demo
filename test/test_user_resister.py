@@ -5,7 +5,7 @@
 @file: test_user_resister.py
 @time: 8/12/18 10:45 PM
 """
-from obj.user.user_model import UserResisterSchema
+from user.user_model import UserResisterSchema
 
 if __name__ == "__main__":
     in_data = {"phone": "18819323232", "password": "1234123"}

@@ -9,7 +9,7 @@ __all__ = ["Core"]
 
 from sanic.log import logger as log
 
-from obj.database.mongo_database.mongo_connection import MongoConnection
+from database.mongo_database.mongo_connection import MongoConnection
 
 
 class Core:

@@ -7,7 +7,7 @@
 """
 from sanic_jwt import BaseEndpoint, utils, exceptions
 
-from obj.util.responsePack import response_package
+from util.responsePack import response_package
 
 
 class MyRefreshEndpoint(BaseEndpoint):

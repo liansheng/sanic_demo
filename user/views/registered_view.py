@@ -11,12 +11,12 @@ from sanic.response import (
 )
 from sanic_jwt import BaseEndpoint, exceptions
 
-from obj.models.user_model import UserModel
-from obj.user.user_marshal import UserResister, UserRegisteredOnlyRead
-from obj.user.user_model import UserResisterSchema, RegisterPhoneSchema
-from obj.util.marshal_with.data_check import typeassert, typeassert_async
-from obj.util.responsePack import response_package
-from obj.util.setting import app
+from models.user_model import UserModel
+from user.user_marshal import UserResister, UserRegisteredOnlyRead
+from user.user_model import UserResisterSchema, RegisterPhoneSchema
+from util.marshal_with.data_check import typeassert, typeassert_async
+from util.responsePack import response_package
+from util.setting import app
 
 
 class MyCustomUserAuthHelper:

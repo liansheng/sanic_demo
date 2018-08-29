@@ -9,11 +9,11 @@ from sanic_jwt import initialize, Authentication, exceptions
 from sanic.response import json
 from sanic_jwt import BaseEndpoint
 
-from obj.user.user_model import RegisterPhoneSchema
-from obj.user.views.registered_view import MyCustomUserAuthHelper
-from obj.util.marshal_with.data_check import typeassert, typeassert_async, typeassert_request
-from obj.util.responsePack import response_package
-from obj.util.setting import app
+from user.user_model import RegisterPhoneSchema
+from user.views.registered_view import MyCustomUserAuthHelper
+from util.marshal_with.data_check import typeassert, typeassert_async, typeassert_request
+from util.responsePack import response_package
+from util.setting import app
 
 
 class CheckRegisteredParm(BaseEndpoint):

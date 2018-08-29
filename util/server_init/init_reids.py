@@ -12,7 +12,6 @@ from marshmallow import Schema, fields
 class InitSchema(Schema):
     head_portrait = fields.Str()
     name = fields.Str()
-    _id = fields.Str()
 
 
 class InitRedis:

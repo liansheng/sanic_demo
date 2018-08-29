@@ -9,19 +9,19 @@ import os
 
 from aoiklivereload.aoiklivereload import LiveReloader
 
-from obj.bp import bp
-from obj.bp2 import bp2
-from obj.user.views.following_view import user_bp
+from bp import bp
+from bp2 import bp2
+from user.views.following_view import user_bp
 from sanic_jwt import initialize
 
-from obj.user.views.check_view import CheckRegisteredParm
-from obj.user.views.login import MyAuthenticateEndpoint
-from obj.user.views.login_view import MyAuthentication
-from obj.user.views.registered_view import Register
-from obj.user.views.logout_view import LogoutEndpoint
-from obj.user.views.refresh_endpoint import MyRefreshEndpoint
-# from obj.util.kafka.producer import ProducerClient
-from obj.util.setting import app
+from user.views.check_view import CheckRegisteredParm
+from user.views.login import MyAuthenticateEndpoint
+from user.views.login_view import MyAuthentication
+from user.views.registered_view import Register
+from user.views.logout_view import LogoutEndpoint
+from user.views.refresh_endpoint import MyRefreshEndpoint
+# from util.kafka.producer import ProducerClient
+from util.setting import app
 from sanic_jwt import utils
 
 reloader = LiveReloader()

@@ -6,7 +6,7 @@
 @time: 8/21/18 6:50 PM
 """
 
-from obj.util.config import kafka_host
+from util.config import kafka_host
 from kafka import KafkaConsumer
 import json
 

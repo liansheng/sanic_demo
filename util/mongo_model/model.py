@@ -9,7 +9,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from bson import ObjectId
-from obj.util.basic.basemodel import BaseModel
+from util.basic.basemodel import BaseModel
 
 
 class MongoDBModel(BaseModel):

@@ -8,7 +8,7 @@
 from sanic import Sanic
 from sanic_jwt import exceptions
 from sanic_jwt import initialize
-from obj.util.globals import r
+from util.globals import r
 from sanic import response
 from sanic.response import json
 

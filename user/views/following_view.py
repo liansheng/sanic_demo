@@ -9,8 +9,8 @@
 from sanic import Blueprint
 from sanic.response import text
 
-from obj.models.user_model import UserModel, Follower
-from obj.models.friends_model import FriendModel
+from models.user_model import UserModel, Follower
+from models.friends_model import FriendModel
 
 from sanic import Sanic
 from sanic.views import HTTPMethodView
@@ -18,13 +18,13 @@ from sanic.response import text, json
 from sanic.exceptions import ServerError
 from sanic_jwt.decorators import protected, inject_user
 
-from obj.user.views.search_view import SearchUser
-from obj.util.setting import app
-from obj.user.services.CheckServices import CheckServer
+from user.views.search_view import SearchUser
+from util.setting import app
+from user.services.CheckServices import CheckServer
 from bson import ObjectId
-from obj.util.responsePack import response_package
-from obj.util.tools import get_user_id_by_request
-from obj.user.services.WriteServices import WriteModelServer
+from util.responsePack import response_package
+from util.tools import get_user_id_by_request
+from user.services.WriteServices import WriteModelServer
 
 user_bp = Blueprint("user", url_prefix="/api/v1")
 

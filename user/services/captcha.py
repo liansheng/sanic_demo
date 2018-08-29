@@ -8,7 +8,7 @@
 import random
 import string
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from obj.util.config import CAPTCHA_URL
+from util.config import CAPTCHA_URL
 import os
 
 

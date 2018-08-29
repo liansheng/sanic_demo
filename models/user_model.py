@@ -8,10 +8,11 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from obj.util.mongo_model.model import MongoDBModel
+from util.mongo_model.model import MongoDBModel
 from sanic.exceptions import SanicException
 import datetime as dt
 from bson import ObjectId
+import copy
 
 
 class Follower(MongoDBModel):
@@ -88,8 +89,9 @@ class Follower(MongoDBModel):
             if count == 1:
                 return "existed"
             else:
-                data1.update(data2)
-                await self.create(data1)
+                new_data = copy.deepcopy(data1)
+                new_data.update(data2)
+                await self.create(new_data)
             return True
         except Exception as e:
             raise AssertionError("关注失败", str(e))

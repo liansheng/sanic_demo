@@ -7,13 +7,13 @@
 """
 from sanic_jwt import initialize, Authentication, exceptions, utils
 from sanic.response import json
-from obj.models.user_model import UserModel
-from obj.user.user_marshal import UserLoginAfter, UserReadModel
-from obj.user.user_model import UserResisterSchema
-from obj.util.marshal_with.data_check import typeassert, typeassert_async
-from obj.util.responsePack import response_package
-from obj.util.setting import app
-from obj.user.check_common_mothed import gen_password
+from models.user_model import UserModel
+from user.user_marshal import UserLoginAfter, UserReadModel
+from user.user_model import UserResisterSchema
+from util.marshal_with.data_check import typeassert, typeassert_async
+from util.responsePack import response_package
+from util.setting import app
+from user.check_common_mothed import gen_password
 
 
 class MyAuthentication(Authentication):

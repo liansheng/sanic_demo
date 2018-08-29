@@ -9,14 +9,14 @@ from sanic.views import HTTPMethodView
 from sanic import response
 from sanic_jwt import protected
 
-from obj.models.friends_model import FriendModel
-from obj.models.user_model import UserModel, Follower
-from obj.user.services.parameter_check import ParameterCheck
-from obj.user.user_model import FansSchema, FollowingSchema, FriendSchema
-from obj.util.setting import app
-from obj.util.tools import get_user_id_by_request
-from obj.user.services.SearchService import SearchServices
-from obj.util.responsePack import response_package
+from models.friends_model import FriendModel
+from models.user_model import UserModel, Follower
+from user.services.parameter_check import ParameterCheck
+from user.user_model import FansSchema, FollowingSchema, FriendSchema
+from util.setting import app
+from util.tools import get_user_id_by_request
+from user.services.SearchService import SearchServices
+from util.responsePack import response_package
 
 parameter_check = ParameterCheck()
 search_service = SearchServices()

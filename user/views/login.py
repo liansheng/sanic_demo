@@ -8,8 +8,8 @@
 from sanic_jwt import BaseEndpoint
 from sanic_jwt import utils
 
-from obj.util.responsePack import response_package
-from obj.util.setting import app
+from util.responsePack import response_package
+from util.setting import app
 import json
 
 

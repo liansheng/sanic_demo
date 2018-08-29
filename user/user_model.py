@@ -6,7 +6,7 @@
 @time: 8/12/18 10:40 PM
 """
 import datetime
-from obj.user.check_common_mothed import validate_phone, validate_must
+from user.check_common_mothed import validate_phone, validate_must
 from marshmallow import Schema, fields, validates, ValidationError, validate
 from bson import ObjectId
 
@@ -35,7 +35,9 @@ class FansSchema(Schema):
 
 
 class FollowingSchema(Schema):
-    myself = fields.Str()
+    user_name = fields.Str(attribute="following_name")
+    user_id = fields.Str(attribute="following_user_id")
+    user_head_portrait = fields.Str(attribute="following_head_portrait")
 
 
 class FriendSchema(Schema):

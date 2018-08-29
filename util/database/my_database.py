@@ -8,7 +8,7 @@
 
 import motor.motor_asyncio
 import asyncio
-from obj.util.setting import DATABASE_CONIFG
+from util.setting import DATABASE_CONIFG
 
 # client = motor.motor_asyncio.AsyncIOMotorClient(DATABASE_CONIFG["host"], DATABASE_CONIFG["port"])
 # db = client["test_database"]

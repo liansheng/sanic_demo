@@ -5,7 +5,7 @@
 @file: WriteServices.py
 @time: 8/28/18 1:55 AM
 """
-from obj.user.user_model import (
+from user.user_model import (
     WriteFollowInfoSchema,
     WriteSelfFollowInfoSchema,
     WriteFollowingFollowInfoSchema,
@@ -46,7 +46,7 @@ class WriteModelServer:
         assert not follow_data.errors, ("关注数据异常", follow_data.errors)
 
         friend_schema = WriteFriendSchema()
-        friend_data = follower_schema.load(new_follow_doc)
+        friend_data = friend_schema.load(new_follow_doc)
         assert not friend_data.errors, ("关注数据异常", friend_data.errors)
 
         # gen data, write data to collection

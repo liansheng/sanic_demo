@@ -9,7 +9,7 @@ from pymongo import MongoClient
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from obj.util.tools import singleton
+from util.tools import singleton
 
 
 @singleton

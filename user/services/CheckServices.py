@@ -7,8 +7,8 @@
 """
 from bson import ObjectId
 
-from obj.models.user_model import UserModel
-from obj.util.setting import app
+from models.user_model import UserModel
+from util.setting import app
 
 
 class CheckServer:

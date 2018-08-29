@@ -10,10 +10,10 @@ import random
 import datetime as dt
 from sqlalchemy.ext.declarative import declarative_base
 
-from obj.user.check_common_mothed import gen_password
-from obj.util.tools import random_str, exeTime
-from obj.models.user_model import UserModel
-from obj.util.config import default_head_portrait
+from user.check_common_mothed import gen_password
+from util.tools import random_str, exeTime
+from models.user_model import UserModel
+from util.config import default_head_portrait
 
 Base = declarative_base()
 

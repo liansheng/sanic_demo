@@ -13,18 +13,18 @@ from sanic.exceptions import SanicException
 import aioredis
 from sanic_cors import CORS, cross_origin
 import asyncio
-from obj.database.mongo_database.mongo import Core as Mongo
-from obj.user.user_marshal import UserResister
+from database.mongo_database.mongo import Core as Mongo
+from user.user_marshal import UserResister
 # from sanic_mongo import Mongo
-from obj.util.responsePack import response_package
-from obj.models.user_model import UserModel
-from obj.util.tools import format_res
+from util.responsePack import response_package
+from models.user_model import UserModel
+from util.tools import format_res
 from kafka import KafkaProducer, KafkaConsumer
-from obj.util.config import kafka_host
+from util.config import kafka_host
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import sys
-from obj.util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG
-from obj.util.server_init.init_reids import InitRedis
+from util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG
+from util.server_init.init_reids import InitRedis
 
 app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)

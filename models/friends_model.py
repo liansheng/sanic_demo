@@ -7,9 +7,12 @@
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+
+import copy
+
 from pypinyin import lazy_pinyin
 
-from obj.util.mongo_model.model import MongoDBModel
+from util.mongo_model.model import MongoDBModel
 from sanic.exceptions import SanicException
 import datetime as dt
 from bson import ObjectId
@@ -45,8 +48,9 @@ class FriendModel(MongoDBModel):
         if await self.check_is_friend(data1["myself_user_id"], data2['friend_user_id']):
             return True
         else:
-            data1.update(data2)
-            await self.create(data1)
+            new_data = copy.deepcopy(data1)
+            new_data.update(data2)
+            await self.create(new_data)
         return True
 
     async def check_is_friend(self, id1, id2):
