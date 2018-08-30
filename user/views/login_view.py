@@ -32,16 +32,16 @@ class MyAuthentication(Authentication):
         user_model = UserModel(collection)
 
         if not registered_phone:
-            raise exceptions.AuthenticationFailed("手机号码为空")
+            raise exceptions.MissingAuthorizationQueryArg("手机号码为空")
         if not password:
-            raise exceptions.AuthenticationFailed("密码为空")
+            raise exceptions.MissingAuthorizationQueryArg("密码为空")
         res = await user_model.find_one(registered_phone=registered_phone, password=gen_password(password))
 
         if res:
             new_res = await user_model.update_by_logging(res["_id"])
             return UserReadModel(data=new_res, status="登录").to_dict()
         else:
-            raise exceptions.AuthenticationFailed(
+            raise exceptions.MissingAuthorizationQueryArg(
                 "手机号码与密码不一致"
             )
 

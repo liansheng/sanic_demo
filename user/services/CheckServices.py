@@ -21,9 +21,9 @@ class CheckServer:
         return True
 
     async def is_user(self, user_id, user_model):
-        assert self.is_real_id(user_id), "要关注的用户不存在"
+        assert self.is_real_id(user_id), "用户不存在"
         doc = await user_model.find_by_id(user_id)
-        assert doc, "要关注的用户不存在"
+        assert doc, "用户不存在"
         return doc
 
 

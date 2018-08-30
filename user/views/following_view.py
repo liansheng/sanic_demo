@@ -18,6 +18,7 @@ from sanic.response import text, json
 from sanic.exceptions import ServerError
 from sanic_jwt.decorators import protected, inject_user
 
+from user.views.edit_profile import EditView
 from user.views.search_view import SearchUser
 from util.setting import app
 from user.services.CheckServices import CheckServer
@@ -25,8 +26,9 @@ from bson import ObjectId
 from util.responsePack import response_package
 from util.tools import get_user_id_by_request
 from user.services.WriteServices import WriteModelServer
+from user.views.change_password import ChangePassword
 
-user_bp = Blueprint("user", url_prefix="/api/v1")
+user_bp = Blueprint("user", url_prefix="/api_user/v1")
 
 check_server = CheckServer()
 write_model_server = WriteModelServer()
@@ -196,3 +198,5 @@ class UnFollow(HTTPMethodView):
 user_bp.add_route(Follow.as_view(), "/user/follow")
 user_bp.add_route(UnFollow.as_view(), "/user/un_follow")
 user_bp.add_route(SearchUser.as_view(), "/user/search")
+user_bp.add_route(ChangePassword.as_view(), "/user/change_password/")
+user_bp.add_route(EditView.as_view(), "/user/edit/")

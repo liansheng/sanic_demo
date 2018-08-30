@@ -286,3 +286,12 @@ class UserModel(MongoDBModel):
         """
         await self.sub_following_count(user_id_1)
         await self.sub_followers_count(user_id_2)
+
+    async def update_password(self, user_id, password):
+        """
+        :param user_id:
+        :param password:
+        :return:
+        """
+        obj = {"password": password}
+        return self.update_by_id(user_id, obj)
