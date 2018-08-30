@@ -10,11 +10,14 @@ import string
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from util.config import CAPTCHA_URL
 import os
+from util.config import CAPTCHA_COLOR
+
 local_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class CreateCaptcha:
-    def __init__(self):
+    def __init__(self, theme):
+        self.theme = theme
         # 字体路径
         self.font_path = os.path.join(local_dir, "Coval-Black.otf")
         # 生成验证码位数
@@ -22,11 +25,11 @@ class CreateCaptcha:
         # 生成图片尺寸
         self.pic_size = (70, 35)
         # 背景颜色，默认为白色
-        self.bg_color = (255, 255, 255)
+        self.bg_color = CAPTCHA_COLOR[self.theme].get("bg", (255, 255, 255))
         # 字体颜色，默认为蓝色
-        self.text_color = (0, 0, 255)
+        self.text_color = CAPTCHA_COLOR[self.theme].get("text", (0, 0, 255))
         # 干扰线颜色，默认为红色
-        self.line_color = (255, 0, 0)
+        self.line_color = CAPTCHA_COLOR[self.theme].get("text", (255, 0, 0))
         # 是否加入干扰线
         self.draw_line = True
         # 加入干扰线条数上下限

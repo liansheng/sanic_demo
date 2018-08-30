@@ -83,7 +83,7 @@ async def process(consumer):
 
 @app.listener('before_server_start')
 async def server_init(app, loop):
-    print("redis config ", app.config["redis"])
+    # print("redis config ", app.config["redis"])
     app.redis = await aioredis.create_redis_pool(address=app.config["redis"]["address"],
                                                  password=app.config["redis"].get("password", None),
                                                  encoding="utf-8")

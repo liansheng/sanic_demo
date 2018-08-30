@@ -120,10 +120,11 @@ class Captcha(BaseEndpoint):
 
     async def get(self, request):
         # return captcha address, and set a  redis k-v, and set k to redis ,
+        theme = request.raw_args.get("theme", "dark")
         uuid = random_str(32)
         image_name = "{}.png".format(uuid)
         image_path = os.path.join(STATIC_IMG_DIR, image_name)
-        x = CreateCaptcha()
+        x = CreateCaptcha(theme)
         image = x.gene_code()
         image.save(image_path)
         await app.redis.set(str(uuid), str(x.text), expire=CAPTCHA_TIMEOUT)

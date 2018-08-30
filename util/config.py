@@ -16,6 +16,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_IMG_DIR = os.path.join(BASE_DIR, "static", "img")
 CAPTCHA_URL = os.path.join(STATIC_IMG_DIR, "captcha.png")
 CAPTCHA_TIMEOUT = 5 * 60
+CAPTCHA_COLOR = {
+    "dark": {
+        "text": (93, 192, 255),
+        "bg": (42, 45, 50)
+    },
+    "bright": {
+        "text": (88, 68, 207),
+        "bg": (237, 237, 237)
+    },
+}
 IMG_RELATIVE_PATH = "/static/img/"
 
 hostname = socket.gethostname()
