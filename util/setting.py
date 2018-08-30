@@ -83,7 +83,10 @@ async def process(consumer):
 
 @app.listener('before_server_start')
 async def server_init(app, loop):
-    app.redis = await aioredis.create_redis_pool(app.config['redis'])
+    print("redis config ", app.config["redis"])
+    app.redis = await aioredis.create_redis_pool(address=app.config["redis"]["address"],
+                                                 password=app.config["redis"].get("password", None),
+                                                 encoding="utf-8")
     # app.producer = KafkaProducer(value_serializer=lambda v: json.dumps(v).encode('utf-8'),
     #                              bootstrap_servers=kafka_host)
     # app.consumer = KafkaConsumer("user", bootstrap_servers=kafka_host, group_id="group111",

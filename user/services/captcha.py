@@ -10,16 +10,17 @@ import string
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from util.config import CAPTCHA_URL
 import os
+local_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class CreateCaptcha:
     def __init__(self):
         # 字体路径
-        self.font_path = r'./Coval-Black.otf'
+        self.font_path = os.path.join(local_dir, "Coval-Black.otf")
         # 生成验证码位数
         self.text_num = 4
         # 生成图片尺寸
-        self.pic_size = (100, 40)
+        self.pic_size = (70, 35)
         # 背景颜色，默认为白色
         self.bg_color = (255, 255, 255)
         # 字体颜色，默认为蓝色
@@ -89,8 +90,9 @@ class CreateCaptcha:
 
 
 if __name__ == "__main__":
-    x = CreateCaptcha()
-    image = x.gene_code()
-    image.show()
-    image.save(CAPTCHA_URL)
-    print(x.text)
+    # x = CreateCaptcha()
+    # image = x.gene_code()
+    # image.show()
+    # image.save(CAPTCHA_URL)
+    # print(x.text)
+    print(local_dir)

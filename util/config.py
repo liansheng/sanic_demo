@@ -15,18 +15,20 @@ default_head_portrait = "/static/img/default_head_portrait.png"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_IMG_DIR = os.path.join(BASE_DIR, "static", "img")
 CAPTCHA_URL = os.path.join(STATIC_IMG_DIR, "captcha.png")
+CAPTCHA_TIMEOUT = 5 * 60
+IMG_RELATIVE_PATH = "/static/img/"
 
 hostname = socket.gethostname()
 if hostname == "ubuntu":
 
-    REDIS_CONFIG = {"redis": ("localhost", 6379)}
+    REDIS_CONFIG = {"redis": {"address": ("localhost", 6379)}}
     DATABASE_CONFIG = {
         "host": "localhost",
         "port": 27017,
         "name": "account_center",
     }
 else:
-    REDIS_CONFIG = {"redis": ("192.168.1.220", 6379, "fawo")}
+    REDIS_CONFIG = {"redis": {"address": ("192.168.1.220", 6379), "password": "fawo"}}
     DATABASE_CONFIG = {
         "host": "192.168.1.220",
         "port": 27017,
@@ -35,3 +37,5 @@ else:
 
 if __name__ == '__main__':
     print(CAPTCHA_URL)
+    print(BASE_DIR)
+    print(os.path.abspath(__file__))

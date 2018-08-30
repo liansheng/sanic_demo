@@ -5,6 +5,8 @@
 @file: login_and_registered_view.py
 @time: 8/16/18 6:25 PM
 """
+import os
+
 from sanic.response import (
     json,
     text
@@ -14,9 +16,13 @@ from sanic_jwt import BaseEndpoint, exceptions
 from models.user_model import UserModel
 from user.user_marshal import UserResister, UserRegisteredOnlyRead
 from user.user_model import UserResisterSchema, RegisterPhoneSchema
+from util.config import STATIC_IMG_DIR, CAPTCHA_TIMEOUT, IMG_RELATIVE_PATH
 from util.marshal_with.data_check import typeassert, typeassert_async
 from util.responsePack import response_package
 from util.setting import app
+from user.services.captcha import CreateCaptcha
+from util.tools import random_str
+import datetime as dt
 
 
 class MyCustomUserAuthHelper:
@@ -57,8 +63,19 @@ class Register(BaseEndpoint):
     # async def options(self, request, *args, **kwargs):
     #     return text("", status=204)
 
+    async def check_captcha(self, captcha_key, captcha_num):
+        key = await app.redis.get(captcha_key)
+        assert key, "验证码已过期"
+        assert key == captcha_num, ("验证码不正确", "原始文本是 {}, 填入文本是 {}".format(key, captcha_num))
+
     @typeassert(UserResisterSchema)
     async def post(self, request, *args, **kwargs):
+        # check captcha
+        captcha_key = request.cookies.get("captcha", None)
+        assert captcha_key, "验证码未填写"
+        captcha_num = request.json.get("captcha", None)
+        await self.check_captcha(captcha_key, captcha_num)
+
         registered_phone = request.json.get('registered_phone', None)
         password = request.json.get('password', None)
         print("request  ---------------------")
@@ -82,7 +99,6 @@ class Register(BaseEndpoint):
         user_id = user.get("id", None)
         key = "refresh_token_{user_id}".format(user_id=user_id)
         res = await app.redis.set(key, refresh_token)
-        print("regi   res ", res)
         output.clear()
 
         output.update(response_package("200", {"access_token": access_token,
@@ -98,3 +114,20 @@ class Register(BaseEndpoint):
         # print(response)
         return response
         # return json()
+
+
+class Captcha(BaseEndpoint):
+
+    async def get(self, request):
+        # return captcha address, and set a  redis k-v, and set k to redis ,
+        uuid = random_str(32)
+        image_name = "{}.png".format(uuid)
+        image_path = os.path.join(STATIC_IMG_DIR, image_name)
+        x = CreateCaptcha()
+        image = x.gene_code()
+        image.save(image_path)
+        await app.redis.set(str(uuid), str(x.text), expire=CAPTCHA_TIMEOUT)
+        url = os.path.join(IMG_RELATIVE_PATH, image_name)
+        response = json(response_package("200", {"url": url, "captcha": uuid}))
+        response.cookies["captcha"] = str(uuid)
+        return response
