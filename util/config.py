@@ -27,6 +27,7 @@ CAPTCHA_COLOR = {
     },
 }
 IMG_RELATIVE_PATH = "/static/img/"
+HEAD_PATH = "/var/www/static/img/user/head/"
 
 hostname = socket.gethostname()
 if hostname == "ubuntu":

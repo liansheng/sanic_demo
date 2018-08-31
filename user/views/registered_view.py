@@ -6,6 +6,9 @@
 @time: 8/16/18 6:25 PM
 """
 import os
+import base64
+
+from io import StringIO, BytesIO
 
 from sanic.response import (
     json,
@@ -72,9 +75,9 @@ class Register(BaseEndpoint):
     async def post(self, request, *args, **kwargs):
         # check captcha
         captcha_key = request.cookies.get("captcha", None)
-        assert captcha_key, "验证码未填写"
         captcha_num = request.json.get("captcha", None)
-        await self.check_captcha(captcha_key, captcha_num)
+        # assert captcha_key, "验证码未填写"
+        # await self.check_captcha(captcha_key, captcha_num)
 
         registered_phone = request.json.get('registered_phone', None)
         password = request.json.get('password', None)
@@ -122,13 +125,15 @@ class Captcha(BaseEndpoint):
         # return captcha address, and set a  redis k-v, and set k to redis ,
         theme = request.raw_args.get("theme", "dark")
         uuid = random_str(32)
-        image_name = "{}.png".format(uuid)
-        image_path = os.path.join(STATIC_IMG_DIR, image_name)
+
         x = CreateCaptcha(theme)
         image = x.gene_code()
-        image.save(image_path)
+        buffer = BytesIO()
+        image.save(buffer, format='png')
+        img_str = base64.b64encode(buffer.getvalue())
+
         await app.redis.set(str(uuid), str(x.text), expire=CAPTCHA_TIMEOUT)
-        url = os.path.join(IMG_RELATIVE_PATH, image_name)
-        response = json(response_package("200", {"url": url, "captcha": uuid}))
+
+        response = json(response_package("200", {"image_b64data": img_str, "captcha": uuid}))
         response.cookies["captcha"] = str(uuid)
         return response

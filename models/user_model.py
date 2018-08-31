@@ -155,7 +155,7 @@ class Follower(MongoDBModel):
 
 class UserModel(MongoDBModel):
     coll_name = "user"
-    unique_fields = ["registered_phone"]
+    unique_fields = ["registered_phone", "name"]
 
     @staticmethod
     def trans_obj_id_str(docs):
@@ -186,21 +186,29 @@ class UserModel(MongoDBModel):
         result = await self.collection.insert_one(obj)
         return result
 
-    async def check_unique(self, obj):
+    async def check_unique(self, obj, message="已被注册"):
         error_list = []
         for fields in self.unique_fields:
+            t = obj.get(fields, None)
+            if t is None:
+                continue
             res = await self.collection.find({fields: obj[fields]}).to_list(length=100)
             if res:
                 # if fields == "registered_phone":
                 #     message = "s"
                 # else:
                 #     message = "not a unique"
-                message = "已被注册"
                 # error_list.append("{} {} is not a unique".format(fields, obj[fields]))
                 error_list.append({fields: "{} {}".format(obj[fields], message)})
         if error_list:
             return error_list
         return False
+
+    async def check_unique_simple_field(self, key, value):
+        res = await self.collection.find({key: value}).to_list(length=100)
+        if res:
+            return False
+        return True
 
     def update_by_logging(self, user_id):
         doc = self.update_last_logging_time(user_id)

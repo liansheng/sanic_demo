@@ -9,6 +9,7 @@
 from sanic.views import HTTPMethodView
 from sanic_jwt.decorators import protected
 from sanic import response
+from sanic.exceptions import InvalidUsage
 
 from models.user_model import UserModel
 from user.user_marshal import UserReadModel
@@ -20,6 +21,7 @@ from util.responsePack import response_package
 class EditView(HTTPMethodView):
     decorators = [protected()]
     fields = ["self_introduction", "name"]
+    unique = ["name"]
 
     def __init__(self):
         self.collection = app.mongo["account_center"].user
@@ -34,6 +36,11 @@ class EditView(HTTPMethodView):
                 if k not in self.fields:
                     continue
                 new_data[k] = v
+            for k, v in new_data.items():
+                if k in self.unique:
+                    res = await self.user_model.check_unique_simple_field(k, v)
+                    if res is False:
+                        raise InvalidUsage("{} 已被使用".format(v))
             doc = await self.user_model.update_by_id(user_id, new_data)
             return response.json(response_package("200", UserReadModel(data=doc, status="").to_dict()))
         except TimeoutError as e:
