@@ -53,7 +53,7 @@ class SearchServices:
 
     async def search_friend(self, collection, data):
         offset = (data["page_num"] - 1) * data["page_size"]
-        key_words = data.get("key_words", None)
+        key_words = data.get("key_words", "")
         # return await collection.raw_find({'myself': data["user_id"]}).skip(offset).to_list(data["page_size"])
         return await collection.find_friends_by_name_and_user_id(user_id=data["user_id"], offset=offset,
                                                                  key_words=key_words, page_size=data["page_size"])
