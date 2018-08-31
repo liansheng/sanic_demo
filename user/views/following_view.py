@@ -19,6 +19,7 @@ from sanic.exceptions import ServerError
 from sanic_jwt.decorators import protected, inject_user
 
 from user.views.edit_profile import EditView
+from user.views.head_view import UploadImageView
 from user.views.search_view import SearchUser
 from util.setting import app
 from user.services.CheckServices import CheckServer
@@ -200,3 +201,4 @@ user_bp.add_route(UnFollow.as_view(), "/user/un_follow")
 user_bp.add_route(SearchUser.as_view(), "/user/search")
 user_bp.add_route(ChangePassword.as_view(), "/user/change_password/")
 user_bp.add_route(EditView.as_view(), "/user/edit/")
+user_bp.add_route(UploadImageView.as_view(), "/user/head/")

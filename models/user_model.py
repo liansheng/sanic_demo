@@ -303,3 +303,12 @@ class UserModel(MongoDBModel):
         """
         obj = {"password": password}
         return self.update_by_id(user_id, obj)
+
+    async def update_head(self, user_id, sum_path):
+        """
+        :param user_id:
+        :param sum_path:
+        :return:
+        """
+        obj = {"head_portrait": sum_path}
+        return self.update_by_id(user_id, obj)

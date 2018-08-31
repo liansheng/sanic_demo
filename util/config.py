@@ -11,7 +11,7 @@ import os
 kafka_host = "172.16.1.120:19092, 172.16.1.121:19092, 172.16.1.122:19092"
 # kafka_host = "172.16.1.122:19092"
 
-default_head_portrait = "/static/img/default_head_portrait.png"
+default_head_portrait = "/static/img/user/head/default_head_portrait.png"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_IMG_DIR = os.path.join(BASE_DIR, "static", "img")
 CAPTCHA_URL = os.path.join(STATIC_IMG_DIR, "captcha.png")
@@ -28,6 +28,7 @@ CAPTCHA_COLOR = {
 }
 IMG_RELATIVE_PATH = "/static/img/"
 HEAD_PATH = "/var/www/static/img/user/head/"
+IMG_PATH = "/var/www/static/"
 
 hostname = socket.gethostname()
 if hostname == "ubuntu":

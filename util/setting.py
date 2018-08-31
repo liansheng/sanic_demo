@@ -23,14 +23,15 @@ from kafka import KafkaProducer, KafkaConsumer
 from util.config import kafka_host
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import sys
-from util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG
+from util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG, IMG_PATH
 from util.server_init.init_reids import InitRedis
 
 app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)
 app.config.update(REDIS_CONFIG)
 # logging.getLogger（' sanic_cors '）。level = logging。DEBUG
-app.static('/static', os.path.join(BASE_DIR, "static"))
+# app.static('/static', os.path.join(BASE_DIR, "static"))
+app.static("/static", IMG_PATH)
 # app.static('/favicon.ico', '../static/img/favicon.ico')
 # app.static('/fa.ico', './s/favicon.ico')
 # app.debug = False
