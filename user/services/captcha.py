@@ -19,7 +19,8 @@ class CreateCaptcha:
     def __init__(self, theme):
         self.theme = theme
         # 字体路径
-        self.font_path = os.path.join(local_dir, "Coval-Black.otf")
+        # self.font_path = os.path.join(local_dir, "Coval-Black.otf")
+        self.font_path = os.path.join(local_dir, "Eride.otf")
         # 生成验证码位数
         self.text_num = 4
         # 生成图片尺寸
@@ -88,7 +89,7 @@ class CreateCaptcha:
                   0.001,
                   float(random.randint(1, 2)) / 500
                   ]
-        # self.image = self.image.transform((self.pic_size[0], self.pic_size[1]), Image.PERSPECTIVE, params)  # 创建扭曲
+        self.image = self.image.transform((self.pic_size[0], self.pic_size[1]), Image.PERSPECTIVE, params)  # 创建扭曲
         # self.image = self.image.filter(ImageFilter.EDGE_ENHANCE_MORE)  # 滤镜，边界加强
         return self.image
 

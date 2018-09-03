@@ -9,7 +9,6 @@ import os
 
 from aoiklivereload.aoiklivereload import LiveReloader
 
-from user.views.following_view import user_bp
 from sanic_jwt import initialize
 
 from user.views.check_view import CheckRegisteredParm
@@ -21,38 +20,24 @@ from user.views.refresh_endpoint import MyRefreshEndpoint
 # from util.kafka.producer import ProducerClient
 from util.setting import app
 from sanic_jwt import utils
+from user.views.following_view import user_bp
 
 reloader = LiveReloader()
 reloader.start_watcher_thread()
+app.blueprint(user_bp)
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
-
-app.blueprint(user_bp)
 
 
 @app.middleware('request')
 async def print_on_request(request):
-    # print(type(app.config.MONGO_URIS))
-    # print(app.config.MONGO_URIS)
     print("I print when a request is received by the server")
-    # print(type(request))
-    # print(dir(request))
-
-    # payload = request.app.auth.extract_payload(request, verify=False)
-    # user = await utils.call(
-    #     request.app.auth.retrieve_user, request, payload=payload
-    # )
-    # user_id = await request.app.auth._get_user_id(user)
-    # print("payload is ", payload)
-    # print("user id ", user)
-    # print("user_id", user_id)
     return request
 
 
 @app.middleware('response')
 async def print_on_response(request, response):
     print("I print when a response is returned by the server")
-    # print(dir(response))
 
 
 # from sanic.response import json

@@ -9,11 +9,11 @@ import hashlib
 import os
 from sanic.response import json
 from sanic.views import HTTPMethodView
+from sanic_jwt import protected
 
 from models.user_model import UserModel
 from util.config import HEAD_PATH
 from PIL import Image
-
 
 # 获取图片后缀名
 from util.setting import app
@@ -34,6 +34,8 @@ class UploadImageView(HTTPMethodView):
          上传图片文件接口,
          business and functionality should be separated, and, too lazy to write
     """
+    decorators = [protected()]
+
     def __init__(self):
         self.collection = app.mongo["account_center"].user
         self.user_model = UserModel(self.collection)

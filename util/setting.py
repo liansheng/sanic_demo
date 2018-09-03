@@ -26,6 +26,7 @@ import sys
 from util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG, IMG_PATH
 from util.server_init.init_reids import InitRedis
 
+
 app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)
 app.config.update(REDIS_CONFIG)
@@ -36,6 +37,7 @@ app.static("/static", IMG_PATH)
 # app.static('/fa.ico', './s/favicon.ico')
 # app.debug = False
 
+
 mongo_uri = "mongodb://{host}:{port}/{database}".format(
     database=DATABASE_CONFIG["name"],
     port=DATABASE_CONFIG["port"],
@@ -43,6 +45,9 @@ mongo_uri = "mongodb://{host}:{port}/{database}".format(
 )
 Mongo.SetConfig(app, account_center=mongo_uri)
 Mongo(app)
+
+
+
 
 
 @app.exception(SanicException, AssertionError)

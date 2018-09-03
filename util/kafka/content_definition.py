@@ -7,9 +7,9 @@
 """
 # message definition
 MESSAGE_TYPE_MAP = {
-    "1": "followers",
-    "2": "following",
-    "3": "friend",
+    "12": "followers",
+    "13": "following",
+    "14": "friend",
 }
 
 base = {
