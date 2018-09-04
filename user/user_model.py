@@ -6,9 +6,14 @@
 @time: 8/12/18 10:40 PM
 """
 import datetime
+
+from models.user_model import Follower
 from user.check_common_mothed import validate_phone, validate_must
 from marshmallow import Schema, fields, validates, ValidationError, validate
 from bson import ObjectId
+from util.setting import app
+
+from util.tools import ObjectID
 
 E = {
     'required': '参数是必须的',
@@ -16,6 +21,9 @@ E = {
     'null': '参数不能为空',
     # 'validator_failed': 'Invalid value.'
 }
+
+
+# follower_model = Follower(app.mongo["account_center"].follower)
 
 
 class UserResisterSchema(Schema):
@@ -41,13 +49,17 @@ class FollowingSchema(Schema):
 
 
 class FriendSchema(Schema):
-    pass
+    user_name = fields.Str(attribute="friend_name")
+    user_id = fields.Str(attribute="friend_user_id")
+    user_head_portrait = fields.Str(attribute="friend_head_portrait")
+    login_user_id = fields.Str()
 
 
 class UserSchema(Schema):
     name = fields.Str()
     head_portrait = fields.Str()
-    id = fields.Str()
+    id = ObjectID(attribute="_id")
+    is_i_follow_him = fields.Bool()
 
 
 class WriteFollowInfoSchema(Schema):

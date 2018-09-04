@@ -56,6 +56,11 @@ class SearchUser(HTTPMethodView):
         model = self.MAPPING[data["type"]]
         schema = self.SchemaMapping[data["type"]]
         data_list = await search_service.search_user(model, data)
+        if data["type"] == "user":
+            for tmp in data_list:
+                tmp["is_i_follow_him"] = await self.follower_model.check_user1_is_following_user2(data["user_id"], str(tmp["_id"]))
+                # tmp["login_user_id"] = data["user_id"]
+                # tmp["follower_model"] = self.follower_model
         res_data = schema(many=True).dump(data_list).data
         print("data_list is ", data_list)
         print("res_data is ", res_data)

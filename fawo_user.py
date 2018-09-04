@@ -57,6 +57,7 @@ async def print_on_response(request, response):
 i = initialize(
     app,
     refresh_token_enabled=True,
+    expiration_delta = 60,
     url_prefix="/api_user/v1/auth",
     class_views=(('/register', Register), ("/check_phone", CheckRegisteredParm),
                  ("/login", MyAuthenticateEndpoint), ("/logout", LogoutEndpoint),

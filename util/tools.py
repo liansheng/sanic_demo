@@ -9,6 +9,7 @@ import random
 import string
 from functools import wraps
 from sanic_jwt import utils
+from marshmallow import fields
 
 
 def format_res(obj):
@@ -90,6 +91,15 @@ async def get_user_id_by_request(request):
     )
     user_id = await request.app.auth._get_user_id(user)
     return user_id
+
+
+class ObjectID(fields.Field):
+    """
+    custom field or bson.ObjectID
+    """
+
+    def _serialize(self, value, attr, obj):
+        return str(value)
 
 
 if __name__ == '__main__':

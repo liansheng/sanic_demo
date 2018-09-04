@@ -27,6 +27,18 @@ class Follower(MongoDBModel):
         following_list = await self.find_list({"myself_user_id": user_id})
         return following_list.count()
 
+    async def check_user1_is_following_user2(self, user1, user2):
+        """
+        :param user1:
+        :param user2:
+        :return:
+        """
+        count = await self.collection.count_documents({"myself_user_id": user1, "following_user_id": user2})
+        if count > 0:
+            return True
+        else:
+            return False
+
     async def find_followers_count_by_user_id(self, user_id):
         """
 
@@ -151,6 +163,52 @@ class Follower(MongoDBModel):
         :return:
         """
         pass
+
+    async def update_head(self, user_id, sum_path):
+        """
+        :param user_id:
+        :param sum_path:
+        :return:
+        """
+        await self.update_myself_head(user_id, sum_path)
+        res = await self.update_following_head(user_id, sum_path)
+        return res
+
+    async def update_following_head(self, user_id, path):
+        """
+        :param user_id:
+        :param path:
+        :return:
+        """
+        criteria = {"following_user_id": user_id}
+        obj_new = {"$set": {"following_head_portrait": path}}
+
+        return await self.update_many(criteria, obj_new)
+
+    async def update_myself_head(self, user_id, path):
+        """
+        :param user_id:
+        :param path:
+        :return:
+        """
+        criteria = {"myself_user_id": user_id}
+        obj_new = {"$set": {"myself_head_portrait": path}}
+        return await self.update_many(criteria, obj_new)
+
+    async def update_name(self, user_id, new_name):
+        await self.update_following_name(user_id, new_name)
+        res = await self.update_myself_name(user_id, new_name)
+        return res
+
+    async def update_following_name(self, user_id, new_name):
+        criteria = {"following_user_id": user_id}
+        obj_new = {"$set": {"following_name": new_name}}
+        return await self.update_many(criteria, obj_new)
+
+    async def update_myself_name(self, user_id, new_name):
+        criteria = {"myself_user_id": user_id}
+        obj_new = {"$set": {"myself_name": new_name}}
+        return await self.update_many(criteria, obj_new)
 
 
 class UserModel(MongoDBModel):

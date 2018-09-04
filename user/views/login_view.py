@@ -17,7 +17,7 @@ from user.check_common_mothed import gen_password
 
 
 class MyAuthentication(Authentication):
-    expiration_delta = 60 * 100
+    expiration_delta = 60
     url_prefix = "/api_user/v1/auth"
 
     # def __init__(self, *args, **kwargs):

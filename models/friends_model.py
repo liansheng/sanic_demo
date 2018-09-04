@@ -84,3 +84,48 @@ class FriendModel(MongoDBModel):
             {"friend_name": {'$regex': key_words}, 'myself_user_id': user_id}
         ).skip(offset).to_list(page_size)
         return docs
+
+    async def update_name(self, user_id, new_name):
+        await self.update_friend_name(user_id, new_name)
+        res = await self.update_myself_name(user_id, new_name)
+        return res
+
+    async def update_friend_name(self, user_id, new_name):
+        criteria = {"friend_user_id": user_id}
+        obj_new = {"$set": {"friend_name": new_name}}
+        return await self.update_many(criteria, obj_new)
+
+    async def update_myself_name(self, user_id, new_name):
+        criteria = {"myself_user_id": user_id}
+        obj_new = {"$set": {"myself_name": new_name}}
+        return await self.update_many(criteria, obj_new)
+
+    async def update_head(self, user_id, sum_path):
+        """
+        :param user_id:
+        :param sum_path:
+        :return:
+        """
+        await self.update_myself_head(user_id, sum_path)
+        res = await self.update_friend_head(user_id, sum_path)
+        return res
+
+    async def update_friend_head(self, user_id, path):
+        """
+        :param user_id:
+        :param path:
+        :return:
+        """
+        criteria = {"friend_user_id": user_id}
+        obj_new = {"$set": {"friend_head_portrait": path}}
+        return await self.update_many(criteria, obj_new)
+
+    async def update_myself_head(self, user_id, path):
+        """
+        :param user_id:
+        :param path:
+        :return:
+        """
+        criteria = {"myself_user_id": user_id}
+        obj_new = {"$set": {"myself_head_portrait": path}}
+        return await self.update_many(criteria, obj_new)
