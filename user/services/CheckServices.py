@@ -7,9 +7,6 @@
 """
 from bson import ObjectId
 
-from models.user_model import UserModel
-from util.setting import app
-
 
 class CheckServer:
 

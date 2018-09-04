@@ -12,7 +12,7 @@ from sanic_jwt import protected
 from models.friends_model import FriendModel
 from models.user_model import UserModel, Follower
 from user.services.parameter_check import ParameterCheck
-from user.user_model import FansSchema, FollowingSchema, FriendSchema
+from user.user_model import FansSchema, FollowingSchema, FriendSchema, UserSchema
 from util.setting import app
 from util.tools import get_user_id_by_request
 from user.services.SearchService import SearchServices
@@ -33,11 +33,13 @@ class SearchUser(HTTPMethodView):
             "followers": self.follower_model,
             "following": self.follower_model,
             "friend": self.friends_model,
+            "user": self.user_model,
         }
         self.SchemaMapping = {
             "followers": FansSchema,
             "following": FollowingSchema,
-            "friend": FriendSchema
+            "friend": FriendSchema,
+            "user": UserSchema,
         }
 
     async def get(self, request):

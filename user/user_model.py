@@ -44,6 +44,12 @@ class FriendSchema(Schema):
     pass
 
 
+class UserSchema(Schema):
+    name = fields.Str()
+    head_portrait = fields.Str()
+    id = fields.Str()
+
+
 class WriteFollowInfoSchema(Schema):
     name = fields.Str(attribute="myself_name")
     head_portrait = fields.Str(attribute="myself_head_portrait")
@@ -114,10 +120,10 @@ if __name__ == '__main__':
     # print(result.data)
     # test1()
     data_list = [{'_id': ObjectId('5b86463e5f627dede7c00731'), 'myself_name': 'fawoaKNNgOTx',
-                   'myself_user_id': '5b7e29dd5f627d0218528819',
-                   'myself_head_portrait': '/static/img/default_head_portrait.jpg', 'following_name': 'fawoM7zemXN7',
-                   'following_user_id': '5b7cfbd45f627ddd88e2c929',
-                   'following_head_portrait': '/static/img/default_head_portrait.png'}]
+                  'myself_user_id': '5b7e29dd5f627d0218528819',
+                  'myself_head_portrait': '/static/img/default_head_portrait.jpg', 'following_name': 'fawoM7zemXN7',
+                  'following_user_id': '5b7cfbd45f627ddd88e2c929',
+                  'following_head_portrait': '/static/img/default_head_portrait.png'}]
     schema = FansSchema(many=True)
     result = schema.load(data_list)
     print(result.data)
@@ -125,4 +131,3 @@ if __name__ == '__main__':
     data = data_list[0]
     r = FansSchema().dump(data)
     print(r.data)
-

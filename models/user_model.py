@@ -251,6 +251,19 @@ class UserModel(MongoDBModel):
         """
         self.inc_field_by_user_id(user_id_2, "followers_count", 1)
 
+    async def update_article_count(self, user_id):
+        self.inc_field_by_user_id(user_id, "article_count", 1)
+
+    async def sub_article_count(self, user_id):
+        """
+        :param user_id:
+        :return:
+        """
+        is_zero = await self.field_is_zero(user_id, "article_count")
+        if is_zero:
+            return True
+        self.inc_field_by_user_id(user_id, "article_count", -1)
+
     async def sub_following_count(self, user_id):
         """
 
@@ -312,3 +325,15 @@ class UserModel(MongoDBModel):
         """
         obj = {"head_portrait": sum_path}
         return self.update_by_id(user_id, obj)
+
+    async def find_user_by_name(self, offset, key_words, page_size):
+        """
+        :param offset:
+        :param key_words:
+        :param page_size:
+        :return:
+        """
+        docs = await self.collection.find(
+            {"name": {'$regex': key_words}}
+        ).skip(offset).to_list(page_size)
+        return docs

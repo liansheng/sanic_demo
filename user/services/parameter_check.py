@@ -19,7 +19,9 @@ class ParameterCheck:
         if "page_num" not in data.keys():
             data["page_num"] = 1
         data["page_num"] = int(data["page_num"])
-        assert data["type"] in ["followers", "following", "friend"], "参数错误"
+        assert data["type"] in ["followers", "following", "friend", "user"], "参数错误"
+        if data["type"] == "user":
+            return data
         assert "user_id" in data.keys()
         assert ObjectId(data["user_id"])
         return data

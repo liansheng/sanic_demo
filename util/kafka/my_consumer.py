@@ -11,7 +11,7 @@ from kafka import KafkaConsumer
 import json
 
 if __name__ == '__main__':
-    consumer = KafkaConsumer("user", bootstrap_servers=kafka_host, group_id="group111",
+    consumer = KafkaConsumer("article", bootstrap_servers=kafka_host, group_id="group111",
                              value_deserializer=lambda m: json.loads(m.decode('ascii')),
                              consumer_timeout_ms=1000)
     # for msg in consumer:

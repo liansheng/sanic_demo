@@ -104,8 +104,11 @@ class MyAuthentication(Authentication):
                 raise exceptions.AuthenticationFailed()
             docs = await user_model.find_by_id(user_id)
             print("docs : ", docs)
-            # return response_package("200", UserLoginAfter(**docs).to_dict())
-            return UserLoginAfter(**docs).to_dict()
+            if docs:
+                # return response_package("200", UserLoginAfter(**docs).to_dict())
+                return UserLoginAfter(**docs).to_dict()
+            else:
+                return response_package("401", {"user_id": None})
             # return {"user_id": user_id}
         else:
             return response_package("401", {"user_id": None})

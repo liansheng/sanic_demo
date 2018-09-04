@@ -7,13 +7,14 @@
 """
 # message definition
 MESSAGE_TYPE_MAP = {
-    "12": "followers",
-    "13": "following",
-    "14": "friend",
+    "followers": "12",
+    "following": "13",
+    "friend": "14"
 }
 
 base = {
     "message_type": "1",
     "self_user_id": "str",
     "target_user_id": "str",
+    "content": ""
 }

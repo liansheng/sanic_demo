@@ -16,6 +16,7 @@ import asyncio
 from database.mongo_database.mongo import Core as Mongo
 from user.user_marshal import UserResister
 # from sanic_mongo import Mongo
+from util.kafka.consumerServer import process
 from util.responsePack import response_package
 from models.user_model import UserModel
 from util.tools import format_res
@@ -25,7 +26,6 @@ from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import sys
 from util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG, IMG_PATH
 from util.server_init.init_reids import InitRedis
-
 
 app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)
@@ -45,9 +45,6 @@ mongo_uri = "mongodb://{host}:{port}/{database}".format(
 )
 Mongo.SetConfig(app, account_center=mongo_uri)
 Mongo(app)
-
-
-
 
 
 @app.exception(SanicException, AssertionError)
@@ -79,12 +76,7 @@ async def consume(loop):
         await consumer.stop()
 
 
-async def process(consumer):
-    print("in ")
-    async for msg in consumer:
-        print("awit ")
-        print("consumed: ", msg.topic, msg.partition, msg.offset,
-              msg.key, msg.value, msg.timestamp)
+
 
 
 @app.listener('before_server_start')
@@ -113,9 +105,13 @@ async def server_init(app, loop):
 async def after_server(app, loop):
     print("begin after server start...")
     app.consumer = AIOKafkaConsumer(
-        'user',
+        'article', "user",
         loop=loop, bootstrap_servers=kafka_host,
-        group_id="my-group4343")
+        group_id="my-group4343123", value_deserializer=lambda m: json.loads(m.decode('ascii')))
+    # app.article_consumer = AIOKafkaConsumer(
+    #     'article',
+    #     loop=loop, bootstrap_servers=kafka_host,
+    #     group_id="my-group123")
 
     # self.collection = app.mongo["account_center"].user
     # self.user_model = UserModel(self.collection)
@@ -131,7 +127,8 @@ async def after_server(app, loop):
     #           msg.key, msg.value, msg.timestamp)
     # loop.run_until_complete(consume(loop))
     await app.consumer.start()
-    await process(app.consumer)
+    await process(app.consumer, app)
+    # await process(app.article_consumer)
     print("finish  server init...")
 
 

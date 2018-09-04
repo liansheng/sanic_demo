@@ -48,7 +48,6 @@ class UploadImageView(HTTPMethodView):
             "code": "200",
             "results": {}
         }
-
         image = request.files.get('file', None)
         assert image, "文件对象名字不正确"
         image = image.body
@@ -80,7 +79,7 @@ class UploadImageView(HTTPMethodView):
         #
         im = Image.open(HEAD_PATH + res_path)
 
-        sum_path = "/static/img/user/head/" + res_path
+        sum_path = "/static/img/user/head" + res_path
         print(sum_path, res_path)
 
         await self.user_model.update_head(user_id, sum_path)

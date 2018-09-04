@@ -10,6 +10,9 @@ from user.user_model import (
     WriteSelfFollowInfoSchema,
     WriteFollowingFollowInfoSchema,
     WriteFriendSchema)
+from util.kafka.productServer import ProductServer
+
+kafka_server = ProductServer()
 
 
 class WriteModelServer:
@@ -51,7 +54,11 @@ class WriteModelServer:
 
         # gen data, write data to collection
         res = await follower_model.update_or_created_follow_relationship_by_data(login_data.data, follow_data.data)
+        # test
+        await kafka_server.send_following_to_message(app, login_user_id, following_user_id,
+                                                     login_data.data["myself_name"])
         if res is not "existed":
+
             # if login id have not follow relationship. then inc following and followers count
             # 3 a->b check, a is <- b, then add friend relationship
             if await follower_model.check_is_mutual_follow(login_user_id, following_user_id):
@@ -59,6 +66,13 @@ class WriteModelServer:
                 await friends_model.add_data(login_data.data, friend_data.data)
                 await app.redis.sadd("{}_{}".format(login_user_id, "friends"), following_user_id)
                 await app.redis.sadd("{}_{}".format(following_user_id, "friends"), login_user_id)
+                # send msg to kafka message
+                await kafka_server.send_friend_to_message(app, login_user_id, following_user_id,
+                                                          login_data.data["myself_name"])
+            else:
+                # send msg to kafka message
+                await kafka_server.send_following_to_message(app, login_user_id, following_user_id,
+                                                             login_data.data["myself_name"])
 
             # 4 update or created follow redis
             await user_model.add_follow_count(login_user_id, following_user_id)

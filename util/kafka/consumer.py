@@ -125,7 +125,7 @@ if __name__ == '__main__':
     consumerClient = ConsumerClient("172.16.1.120:19092,172.16.1.121:19092,172.16.1.122:19092",
                                     consumer_group="consumer_group_11")
     # 指定topic,订阅主题，订阅不同的主题即可消费不同类型的消息
-    topic = consumerClient.get_topic("user")
+    topic = consumerClient.get_topic("article")
     # 获取负载均衡消费者客户端
     balanced_consumer = consumerClient.get_balanced_consumer(topic)
 
