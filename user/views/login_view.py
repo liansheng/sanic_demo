@@ -17,7 +17,7 @@ from user.check_common_mothed import gen_password
 
 
 class MyAuthentication(Authentication):
-    expiration_delta = 60
+    expiration_delta = 60 * 60 * 24
     url_prefix = "/api_user/v1/auth"
 
     # def __init__(self, *args, **kwargs):
@@ -39,7 +39,7 @@ class MyAuthentication(Authentication):
 
         if res:
             new_res = await user_model.update_by_logging(res["_id"])
-            return UserReadModel(data=new_res, status="登录").to_dict()
+            return await UserReadModel(data=new_res, status="登录").to_dict()
         else:
             raise exceptions.MissingAuthorizationQueryArg(
                 "手机号码与密码不一致"

@@ -80,6 +80,20 @@ class FriendModel(MongoDBModel):
         return True
 
     async def find_friends_by_name_and_user_id(self, user_id, offset, key_words="", page_size=20):
+        """
+        docs = await self.collection.find(
+            {"$or":
+                [{"friend_name": {'$regex': key_words}, 'myself_user_id': user_id},
+                 {"myself_name": {'$regex': key_words}, 'friend_user_id': user_id}]
+            }
+        ).skip(offset).to_list(page_size)
+
+        :param user_id:
+        :param offset:
+        :param key_words:
+        :param page_size:
+        :return:
+        """
         docs = await self.collection.find(
             {"friend_name": {'$regex': key_words}, 'myself_user_id': user_id}
         ).skip(offset).to_list(page_size)

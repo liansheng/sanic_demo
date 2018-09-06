@@ -11,9 +11,9 @@ import datetime as dt
 from sqlalchemy.ext.declarative import declarative_base
 
 from user.check_common_mothed import gen_password
-from util.tools import random_str, exeTime
+from util.tools import random_str, exeTime, head_portrait_change_change_change
 from models.user_model import UserModel
-from util.config import default_head_portrait
+from util.config import default_head_portrait, do_main
 
 Base = declarative_base()
 
@@ -21,27 +21,28 @@ Base = declarative_base()
 class UserReadModel:
     fields = ["user_id", "registered_phone", "name", "registration_sourece", "self_introduction",
               "qq", "wechat", "head_portrait", "following_count", "followers_count", "firend_count",
-              "created_time", "is_add_bus_card", "is_add_id_card", "last_logging_time"]
+              "created_time", "is_add_bus_card", "is_add_id_card", "last_logging_time", "article_count"]
 
     def __init__(self, data, status):
         self.data = data
         self.status = status
 
-    def to_dict(self):
+    async def to_dict(self):
         res = {}
         for field in self.fields:
             if field in self.data.keys():
                 res[field] = self.data[field]
             else:
                 res[field] = None
-        res = self.update(res)
+        res = await self.update(res)
         return res
 
-    def update(self, res):
+    async def update(self, res):
         res = self.update_status(res)
         res = self.update_user_id(res)
         res = self.update_created_time(res)
         res = self.update_last_logging_time(res)
+        res = await head_portrait_change_change_change(res)
         return res
 
     def update_last_logging_time(self, res):
@@ -77,10 +78,20 @@ class UserRegisteredOnlyRead:
 
     def update(self, res):
         res = self.update_id(res)
+        res = self.update_head_portrait(res)
         return res
 
     def update_id(self, res):
-        res["id"] = str(res.pop("_id", None))
+        res["user_id"] = str(res.pop("_id", None))
+        return res
+
+    @staticmethod
+    def update_head_portrait(res):
+        head_portrait = res.pop("head_portrait", None)
+        if head_portrait:
+            res["head_portrait"] = do_main + head_portrait
+        else:
+            res["head_portrait"] = do_main + default_head_portrait
         return res
 
 
@@ -90,7 +101,7 @@ class UserResister:
     fields = ["name", "registered_phone", "password", "created_time", "registration_source",
               "self_introduction", "qq", "wechat", "gender", "head_portrait", "is_add_id_card",
               "is_add_bus_card", "last_logging_time", "bus_card_info", "id_card_info",
-              "following_count", "followers_count", "friend_count"]
+              "following_count", "followers_count", "friend_count", "article_count"]
 
     def __init__(self, registered_phone, password, user_model, registration_source="phone"):
         self.user_model = user_model
@@ -117,6 +128,7 @@ class UserResister:
         self.following_count = 0  # 关注数量
         self.followers_count = 0  # 粉丝数量
         self.friend_count = 0  # 好友数量
+        self.article_count = 0  #
 
     @staticmethod
     def default_gender():

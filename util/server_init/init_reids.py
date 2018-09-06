@@ -21,12 +21,32 @@ class InitRedis:
         self.user_model = user_model
         pass
 
+    async def init(self):
+        await self.init_user_info_to_redis()
+        # await self.init_all_user_id_set_to_redis()
+
+    # async def init_all_user_id_set_to_redis(self):
+
     async def _gen_user_info(self, doc):
         res_data = {}
         for field in self.init_user_info_keys:
             res_data[field] = doc.get(field, None)
 
         return res_data
+
+    async def add_a_user_id_to_redis(self, user_id):
+        key = "all_user_id_set"
+        await self.redis.sadd(key, str(user_id))
+
+    async def add_user_id_to_redis(self, page_docs):
+        """
+        :param page_docs:
+        :return:
+        """
+        key = "all_user_id_set"
+        for doc in page_docs:
+            values = str(doc["_id"])
+            await self.redis.sadd(key, values)
 
     async def add_user_info_to_redis(self, page_docs):
         for doc in page_docs:
@@ -50,6 +70,7 @@ class InitRedis:
             offset = step * times
             page_docs = await self.user_model.find_list().skip(offset).to_list(step)
             await self.add_user_info_to_redis(page_docs)
+            await self.add_user_id_to_redis(page_docs)
             if len(page_docs) < step:
                 break
             times += 1

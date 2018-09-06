@@ -21,12 +21,13 @@ from util.responsePack import response_package
 from models.user_model import UserModel
 from util.tools import format_res
 from kafka import KafkaProducer, KafkaConsumer
-from util.config import kafka_host
+from util.config import kafka_host, LOG_SETTINGS
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import sys
 from util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG, IMG_PATH
 from util.server_init.init_reids import InitRedis
 
+# app = Sanic(log_config=LOG_SETTINGS)
 app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)
 app.config.update(REDIS_CONFIG)
@@ -59,21 +60,21 @@ async def process_exception(request, exception):
     # return json(response_package(str(status_code), results=exception.args))
 
 
-async def consume(loop):
-    consumer = AIOKafkaConsumer(
-        'user',
-        loop=loop, bootstrap_servers=kafka_host,
-        group_id="my-group")
-    # Get cluster layout and join group `my-group`
-    await consumer.start()
-    try:
-        # Consume messages
-        async for msg in consumer:
-            print("consumed: ", msg.topic, msg.partition, msg.offset,
-                  msg.key, msg.value, msg.timestamp)
-    finally:
-        # Will leave consumer group; perform autocommit if enabled.
-        await consumer.stop()
+# async def consume(loop):
+#     consumer = AIOKafkaConsumer(
+#         'user',
+#         loop=loop, bootstrap_servers=kafka_host,
+#         group_id="my-group")
+#     # Get cluster layout and join group `my-group`
+#     await consumer.start()
+#     try:
+#         # Consume messages
+#         async for msg in consumer:
+#             print("consumed: ", msg.topic, msg.partition, msg.offset,
+#                   msg.key, msg.value, msg.timestamp)
+#     finally:
+#         # Will leave consumer group; perform autocommit if enabled.
+#         await consumer.stop()
 
 
 
@@ -105,7 +106,7 @@ async def server_init(app, loop):
 async def after_server(app, loop):
     print("begin after server start...")
     app.consumer = AIOKafkaConsumer(
-        'article', "user",
+        'article', "user", "message",
         loop=loop, bootstrap_servers=kafka_host,
         group_id="my-group4343123", value_deserializer=lambda m: json.loads(m.decode('ascii')))
     # app.article_consumer = AIOKafkaConsumer(

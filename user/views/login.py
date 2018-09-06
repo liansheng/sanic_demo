@@ -8,9 +8,11 @@
 from sanic_jwt import BaseEndpoint
 from sanic_jwt import utils
 
+from util.kafka.productServer import SendServer
 from util.responsePack import response_package
 from util.setting import app
-import json
+
+send_kafka_server = SendServer()
 
 
 class MyAuthenticateEndpoint(BaseEndpoint):
@@ -57,12 +59,6 @@ class MyAuthenticateEndpoint(BaseEndpoint):
             config=self.config,
         )
         resp.cookies["user_id"] = user.get("user_id", None)
-        await self.send_login_info_to_kafka(user)
+        await send_kafka_server.send_to(app, "user", "login", user)
+        # await self.send_login_info_to_kafka(user)
         return await self.do_response(resp)
-
-    async def send_login_info_to_kafka(self, user):
-        # app.producerClient.sync_produce_message("user", message=json.dumps(user))
-        # app.producerClient.sync_produce_message("user", message=json.dumps(user))
-        print("send user is ", user)
-        await app.producer.send("user", user)
-        return True

@@ -11,6 +11,8 @@ from functools import wraps
 from sanic_jwt import utils
 from marshmallow import fields
 
+from util.config import do_main, default_head_portrait
+
 
 def format_res(obj):
     print("obj is ", obj)
@@ -100,6 +102,19 @@ class ObjectID(fields.Field):
 
     def _serialize(self, value, attr, obj):
         return str(value)
+
+
+async def head_portrait_change_change_change(res, default_key="head_portrait"):
+    if isinstance(res, dict) and default_key in res.keys():
+        pass
+    else:
+        return res
+    head_portrait = res.pop(default_key, None)
+    if head_portrait:
+        res[default_key] = do_main + head_portrait
+    else:
+        res[default_key] = do_main + default_head_portrait
+    return res
 
 
 if __name__ == '__main__':

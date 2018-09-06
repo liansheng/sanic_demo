@@ -238,29 +238,40 @@ class UserModel(MongoDBModel):
 
     async def create(self, obj):
         # user created need check register_phone unique
-        check_res = await self.check_unique(obj)
+        check_res = await self.new_check_unique(obj)
         if check_res is not False:
             raise SanicException(check_res)
         result = await self.collection.insert_one(obj)
         return result
 
-    async def check_unique(self, obj, message="已被注册"):
-        error_list = []
-        for fields in self.unique_fields:
-            t = obj.get(fields, None)
-            if t is None:
-                continue
-            res = await self.collection.find({fields: obj[fields]}).to_list(length=100)
+    async def new_check_unique(self, obj):
+        return await self.check_phone(obj)
+
+    async def check_phone(self, obj):
+        registered_phone = obj.get("registered_phone", None)
+        if registered_phone:
+            res = await self.collection.find({"registered_phone": registered_phone}).to_list(length=100)
             if res:
-                # if fields == "registered_phone":
-                #     message = "s"
-                # else:
-                #     message = "not a unique"
-                # error_list.append("{} {} is not a unique".format(fields, obj[fields]))
-                error_list.append({fields: "{} {}".format(obj[fields], message)})
-        if error_list:
-            return error_list
+                return "{} 已被注册".format(registered_phone)
         return False
+
+    # async def check_unique(self, obj, message="已被注册"):
+    #     error_list = []
+    #     for fields in self.unique_fields:
+    #         t = obj.get(fields, None)
+    #         if t is None:
+    #             continue
+    #         res = await self.collection.find({fields: obj[fields]}).to_list(length=100)
+    #         if res:
+    #             # if fields == "registered_phone":
+    #             #     message = "s"
+    #             # else:
+    #             #     message = "not a unique"
+    #             # error_list.append("{} {} is not a unique".format(fields, obj[fields]))
+    #             error_list.append({fields: "{} {}".format(obj[fields], message)})
+    #     if error_list:
+    #         return error_list
+    #     return False
 
     async def check_unique_simple_field(self, key, value):
         res = await self.collection.find({key: value}).to_list(length=100)

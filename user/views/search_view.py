@@ -14,7 +14,7 @@ from models.user_model import UserModel, Follower
 from user.services.parameter_check import ParameterCheck
 from user.user_model import FansSchema, FollowingSchema, FriendSchema, UserSchema
 from util.setting import app
-from util.tools import get_user_id_by_request
+from util.tools import get_user_id_by_request, head_portrait_change_change_change
 from user.services.SearchService import SearchServices
 from util.responsePack import response_package
 
@@ -56,12 +56,13 @@ class SearchUser(HTTPMethodView):
         model = self.MAPPING[data["type"]]
         schema = self.SchemaMapping[data["type"]]
         data_list = await search_service.search_user(model, data)
-        if data["type"] == "user":
-            for tmp in data_list:
-                tmp["is_i_follow_him"] = await self.follower_model.check_user1_is_following_user2(data["user_id"], str(tmp["_id"]))
-                # tmp["login_user_id"] = data["user_id"]
-                # tmp["follower_model"] = self.follower_model
+        # if data["type"] == "user":
         res_data = schema(many=True).dump(data_list).data
+        for tmp in res_data:
+            print(data["user_id"], str(tmp["user_id"]))
+            tmp["is_i_follow_him"] = await self.follower_model.check_user1_is_following_user2(data["user_id"], str(tmp["user_id"]))
+            tmp = await head_portrait_change_change_change(tmp, "user_head_portrait")
+
         print("data_list is ", data_list)
         print("res_data is ", res_data)
         # data_list, need serializers

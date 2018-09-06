@@ -20,6 +20,7 @@ from sanic_jwt.decorators import protected, inject_user
 
 from user.views.edit_profile import EditView
 from user.views.head_view import UploadImageView
+from user.views.personal_infomation import PersonalInfomation
 from user.views.search_view import SearchUser
 from util.setting import app
 from user.services.CheckServices import CheckServer
@@ -33,51 +34,6 @@ user_bp = Blueprint("user", url_prefix="/api_user/v1")
 
 check_server = CheckServer()
 write_model_server = WriteModelServer()
-
-
-class SimpleView(HTTPMethodView):
-    def __init__(self):
-        self.collection = app.mongo["account_center"].user
-        self.user_model = UserModel(self.collection)
-
-    async def get(self, request):
-        print(dir(request))
-        print(request.args)
-        return text('I am get method async')
-
-    async def post(self, request):
-        return text('I am post method')
-
-    async def put(self, request):
-        return text('I am put method')
-
-    async def patch(self, request):
-        return text('I am patch method')
-
-    async def delete(self, request):
-        return text('I am delete method')
-
-
-class SimpleView2(HTTPMethodView):
-    decorators = [protected()]
-
-    # @inject_user()
-    def get(self, request):
-        print(dir(request))
-        print(request.args)
-        return json("this is protected")
-
-    def post(self, request):
-        return text('I am post method')
-
-    def put(self, request):
-        return text('I am put method')
-
-    def patch(self, request):
-        return text('I am patch method')
-
-    def delete(self, request):
-        return text('I am delete method')
 
 
 class Follow(HTTPMethodView):
@@ -108,6 +64,8 @@ class Follow(HTTPMethodView):
         assert login_user_id, "当前没有用户登录"
         following_user_id = request.json.get("following_user_id", None)
         assert following_user_id, "参数不能为空"
+        assert login_user_id != following_user_id, (
+            "关注错误，自己不能关注自己", "login_user_id {}, following_user_id {}".format(login_user_id, following_user_id))
 
         # 1 check user id is real user
         await check_server.is_user(following_user_id, self.user_model)
@@ -133,15 +91,6 @@ class Follow(HTTPMethodView):
         #     await app.redis.sadd("{}_{}".format(login_user_id, "follower"), following_user_id)
 
         return json(response_package("200", {}))
-
-    # def put(self, request):
-    #     return text('I am put method')
-    #
-    # def patch(self, request):
-    #     return text('I am patch method')
-
-    # def delete(self, request):
-    #     return text('I am delete method')
 
 
 class UnFollow(HTTPMethodView):
@@ -171,6 +120,8 @@ class UnFollow(HTTPMethodView):
         assert login_user_id, "当前没有用户登录"
         following_user_id = request.json.get("un_following_user_id", None)
         assert following_user_id, "参数不能为空"
+        assert login_user_id != following_user_id, (
+            "取消关注错误，自己不能对自己操作", "login_user_id {}, following_user_id {}".format(login_user_id, following_user_id))
 
         # 1 check user id is real user
         await check_server.is_user(following_user_id, self.user_model)
@@ -202,3 +153,4 @@ user_bp.add_route(SearchUser.as_view(), "/user/search")
 user_bp.add_route(ChangePassword.as_view(), "/user/change_password/")
 user_bp.add_route(EditView.as_view(), "/user/edit/")
 user_bp.add_route(UploadImageView.as_view(), "/user/head/")
+user_bp.add_route(PersonalInfomation.as_view(), "/user/<user_id>/")

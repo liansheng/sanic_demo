@@ -53,6 +53,7 @@ class EditView(HTTPMethodView):
             for k, v in new_data.items():
                 if k in self.update_to_friend_follow:
                     await update_server.update_name(k, v, user_id, self.follower_model, self.friends_model)
-            return response.json(response_package("200", UserReadModel(data=doc, status="").to_dict()))
+            data = await UserReadModel(data=doc, status="").to_dict()
+            return response.json(response_package("200", data))
         except TimeoutError as e:
             return response.json(response_package("999", {"e": str(e)}))

@@ -64,6 +64,7 @@ class WriteModelServer:
             if await follower_model.check_is_mutual_follow(login_user_id, following_user_id):
                 # await friends_model.add(login_user_id, following_user_id)
                 await friends_model.add_data(login_data.data, friend_data.data)
+                await friends_model.add_data(self_schema.load(new_follow_doc).data, friend_schema.load(new_doc).data)
                 await app.redis.sadd("{}_{}".format(login_user_id, "friends"), following_user_id)
                 await app.redis.sadd("{}_{}".format(following_user_id, "friends"), login_user_id)
                 # send msg to kafka message
@@ -118,6 +119,7 @@ class WriteModelServer:
             # if login id have not follow relationship. then inc following and followers count
             # 3 delete friend relationship
             await friends_model.remove(login_user_id, following_user_id)
+            await friends_model.remove(following_user_id, login_user_id)
             await app.redis.srem("{}_{}".format(login_user_id, "friends"), following_user_id)
             await app.redis.srem("{}_{}".format(following_user_id, "friends"), login_user_id)
 

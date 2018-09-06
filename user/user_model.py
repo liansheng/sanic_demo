@@ -40,25 +40,27 @@ class FansSchema(Schema):
     user_name = fields.Str(attribute="myself_name")
     user_id = fields.Str(attribute="myself_user_id")
     user_head_portrait = fields.Str(attribute="myself_head_portrait")
+    is_i_follow_him = fields.Bool()
 
 
 class FollowingSchema(Schema):
     user_name = fields.Str(attribute="following_name")
     user_id = fields.Str(attribute="following_user_id")
     user_head_portrait = fields.Str(attribute="following_head_portrait")
+    is_i_follow_him = fields.Bool()
 
 
 class FriendSchema(Schema):
     user_name = fields.Str(attribute="friend_name")
     user_id = fields.Str(attribute="friend_user_id")
     user_head_portrait = fields.Str(attribute="friend_head_portrait")
-    login_user_id = fields.Str()
+    is_i_follow_him = fields.Bool()
 
 
 class UserSchema(Schema):
-    name = fields.Str()
-    head_portrait = fields.Str()
-    id = ObjectID(attribute="_id")
+    user_name = fields.Str(attribute="name")
+    user_head_portrait = fields.Str(attribute="head_portrait")
+    user_id = ObjectID(attribute="_id")
     is_i_follow_him = fields.Bool()
 
 

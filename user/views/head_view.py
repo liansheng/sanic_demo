@@ -12,7 +12,7 @@ from sanic.views import HTTPMethodView
 from sanic_jwt import protected
 
 from models.user_model import UserModel
-from util.config import HEAD_PATH
+from util.config import HEAD_PATH, do_main
 from PIL import Image
 
 # 获取图片后缀名
@@ -84,7 +84,7 @@ class UploadImageView(HTTPMethodView):
 
         await self.user_model.update_head(user_id, sum_path)
         # 给客户端返回结果
-        return_data['results']['path'] = sum_path
+        return_data['results']['path'] = do_main + sum_path
         return_data['results']['width'] = im.size[0]
         return_data['results']['height'] = im.size[1]
         return json(return_data)

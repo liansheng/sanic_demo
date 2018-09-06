@@ -20,12 +20,16 @@ from models.user_model import UserModel
 from user.user_marshal import UserResister, UserRegisteredOnlyRead
 from user.user_model import UserResisterSchema, RegisterPhoneSchema
 from util.config import STATIC_IMG_DIR, CAPTCHA_TIMEOUT, IMG_RELATIVE_PATH
+from util.kafka.productServer import SendServer
 from util.marshal_with.data_check import typeassert, typeassert_async
 from util.responsePack import response_package
+from util.server_init.init_reids import InitRedis
 from util.setting import app
 from user.services.captcha import CreateCaptcha
 from util.tools import random_str
 import datetime as dt
+
+send_kafka_server = SendServer()
 
 
 class MyCustomUserAuthHelper:
@@ -87,6 +91,9 @@ class Register(BaseEndpoint):
 
         helper = MyCustomUserAuthHelper()
         user = await helper.register_new_user(registered_phone=registered_phone, password=password)
+        await send_kafka_server.send_to(app=app, topic="user", message_type="register", body=user)
+        init_redis = InitRedis(app.redis, UserModel(app.mongo["account_center"].user))
+        await init_redis.add_a_user_id_to_redis(str(user["_id"]))
 
         access_token, output = await self.responses.get_access_token_output(
             request,
