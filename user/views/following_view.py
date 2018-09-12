@@ -116,7 +116,7 @@ class UnFollow(HTTPMethodView):
         :return:
         """
         # param check
-        login_user_id = request.cookies.get("user_id", None)
+        login_user_id = await get_user_id_by_request(request)
         assert login_user_id, "当前没有用户登录"
         following_user_id = request.json.get("un_following_user_id", None)
         assert following_user_id, "参数不能为空"

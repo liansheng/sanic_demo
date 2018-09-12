@@ -21,14 +21,14 @@ from util.responsePack import response_package
 from models.user_model import UserModel
 from util.tools import format_res
 from kafka import KafkaProducer, KafkaConsumer
-from util.config import kafka_host, LOG_SETTINGS
+from util.config import kafka_host, LOG_SETTINGS_CONFIG
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import sys
 from util.config import BASE_DIR, REDIS_CONFIG, DATABASE_CONFIG, IMG_PATH
 from util.server_init.init_reids import InitRedis
 
-# app = Sanic(log_config=LOG_SETTINGS)
-app = Sanic()
+app = Sanic(log_config=LOG_SETTINGS_CONFIG)
+# app = Sanic()
 CORS(app, automatic_options=True, origins="*", send_wildcard=True)
 app.config.update(REDIS_CONFIG)
 # logging.getLogger（' sanic_cors '）。level = logging。DEBUG
@@ -108,7 +108,7 @@ async def after_server(app, loop):
     app.consumer = AIOKafkaConsumer(
         'article', "user", "message",
         loop=loop, bootstrap_servers=kafka_host,
-        group_id="my-group4343123", value_deserializer=lambda m: json.loads(m.decode('ascii')))
+        group_id="my-group-ubuntu123", value_deserializer=lambda m: json.loads(m.decode('ascii')))
     # app.article_consumer = AIOKafkaConsumer(
     #     'article',
     #     loop=loop, bootstrap_servers=kafka_host,

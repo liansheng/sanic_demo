@@ -19,8 +19,8 @@ class CreateCaptcha:
     def __init__(self, theme):
         self.theme = theme
         # 字体路径
-        # self.font_path = os.path.join(local_dir, "Coval-Black.otf")
-        self.font_path = os.path.join(local_dir, "Eride.otf")
+        self.font_path = os.path.join(local_dir, "Coval-Black.otf")
+        # self.font_path = os.path.join(local_dir, "Eride.otf")
         # 生成验证码位数
         self.text_num = 4
         # 生成图片尺寸

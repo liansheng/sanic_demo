@@ -7,6 +7,10 @@
 """
 from models.user_model import UserModel
 from user.services.CheckServices import CheckServer
+import logging
+# from sanic import worker
+
+logger = logging.getLogger("user")
 
 
 async def process(consumer, app):
@@ -16,7 +20,10 @@ async def process(consumer, app):
         print("awit ")
         print("consumed: ", msg.topic, msg.partition, msg.offset,
               msg.key, msg.value, msg.timestamp)
-        await consumer_server.route(data=msg.value)
+        # logger.debug(msg.value)
+        # logger.error(msg.value)
+        # logger.info(msg.value)
+        await consumer_server.route(data=msg.value, topic_name=msg.topic)
 
 
 class ConsumerServer:
@@ -24,19 +31,20 @@ class ConsumerServer:
         self.collection = app.mongo["account_center"].user
         self.user_model = UserModel(self.collection)
 
-    async def route(self, data):
-        if "type" in data:
-            # assert "user_id" in data.keys(), ""
-            # check user_id
-            check_server = CheckServer()
-            try:
-                res = await check_server.is_user(data["messages"]["user_id"], self.user_model)
-            except Exception as e:
-                return None
-            if data["type"] == "-1":
-                await self.delete_article(data)
-            if data["type"] == "1":
-                await self.add_article(data)
+    async def route(self, data, topic_name):
+        if topic_name == "article":
+            if "type" in data:
+                # assert "user_id" in data.keys(), ""
+                # check user_id
+                check_server = CheckServer()
+                try:
+                    res = await check_server.is_user(data["messages"]["user_id"], self.user_model)
+                except Exception as e:
+                    return None
+                if data["type"] == "-1":
+                    await self.delete_article(data)
+                if data["type"] == "1":
+                    await self.add_article(data)
 
     async def add_article(self, data):
         """
@@ -46,6 +54,7 @@ class ConsumerServer:
         :param data:
         :return:
         """
+        print(data["messages"]["user_id"], " add article count")
         await self.user_model.update_article_count(data["messages"]["user_id"])
         pass
 

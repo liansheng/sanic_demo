@@ -54,9 +54,7 @@ class WriteModelServer:
 
         # gen data, write data to collection
         res = await follower_model.update_or_created_follow_relationship_by_data(login_data.data, follow_data.data)
-        # test
-        await kafka_server.send_following_to_message(app, login_user_id, following_user_id,
-                                                     login_data.data["myself_name"])
+
         if res is not "existed":
 
             # if login id have not follow relationship. then inc following and followers count
@@ -80,6 +78,23 @@ class WriteModelServer:
             if isinstance(following_user_id, bytes):
                 following_user_id = following_user_id.decode()
             await app.redis.sadd("{}_{}".format(login_user_id, "follower"), following_user_id)
+
+        await self.sync_user_follower_friend_count(login_user_id, follower_model, user_model, friends_model)
+
+    async def sync_user_follower_friend_count(self, user_id, follower_model, user_model, friends_model):
+        """
+        :param user_id:
+        :return:
+        """
+        followers_count = await follower_model.get_followers_count(user_id)
+        following_count = await follower_model.get_following_count(user_id)
+        friend_count = await friends_model.get_friends_count(user_id)
+
+        await user_model.update_followers_count(user_id, followers_count)
+        await user_model.update_following_count(user_id, following_count)
+        await user_model.update_friend_count(user_id, friend_count)
+
+        pass
 
     async def write_unfollower_relationship(self, app, follower_model, user_model, friends_model, login_user_id,
                                             following_user_id):

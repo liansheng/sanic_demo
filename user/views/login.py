@@ -7,12 +7,16 @@
 """
 from sanic_jwt import BaseEndpoint
 from sanic_jwt import utils
+# from sanic.log import l
 
 from util.kafka.productServer import SendServer
 from util.responsePack import response_package
 from util.setting import app
+from util.tools import get_extra
+import logging
 
 send_kafka_server = SendServer()
+logger = logging.getLogger("user")
 
 
 class MyAuthenticateEndpoint(BaseEndpoint):
@@ -51,6 +55,7 @@ class MyAuthenticateEndpoint(BaseEndpoint):
 
         output = response_package("200", output)
         print("output is ", output)
+        logger.info(output, await get_extra(request))
         resp = self.responses.get_token_reponse(
             request,
             access_token,

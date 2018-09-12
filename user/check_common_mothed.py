@@ -11,9 +11,18 @@ from sanic.exceptions import SanicException
 import time
 import hashlib
 
+
 def validate_must(field):
     if not field:
         raise SanicException("{} is must".format(field))
+
+
+def validate_password(password):
+    if not isinstance(password, str):
+        raise SanicException("密码类型不正确")
+    len_psd = len(password)
+    if len_psd < 6 or len_psd > 20:
+        raise SanicException("密码长度必须在6位到20位之间")
 
 
 def validate_phone(phone):

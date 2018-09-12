@@ -82,4 +82,4 @@ class SendServer:
     async def send_to(self, app, topic, message_type, body):
         send_user_sum["head"]["message_type"] = USER_MESSAGE_TYPE_ANTI_MAP.get(message_type, None)
         send_user_sum["body"] = body
-        await app.producer.send(topic, body)
+        await app.producer.send(topic, send_user_sum)

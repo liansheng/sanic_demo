@@ -53,6 +53,13 @@ class FriendModel(MongoDBModel):
             await self.create(new_data)
         return True
 
+    async def get_friends_count(self, user_id):
+        """
+        :param user_id:
+        :return:
+        """
+        return await self.collection.count_documents({"myself_user_id": user_id})
+
     async def check_is_friend(self, id1, id2):
         """
         check two people are friends

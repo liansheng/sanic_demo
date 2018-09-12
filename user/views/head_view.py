@@ -11,13 +11,17 @@ from sanic.response import json
 from sanic.views import HTTPMethodView
 from sanic_jwt import protected
 
-from models.user_model import UserModel
+from models.friends_model import FriendModel
+from models.user_model import UserModel, Follower
+from user.services.update_user_info_to_friend_and_follow import UpdateServer
 from util.config import HEAD_PATH, do_main
 from PIL import Image
 
 # 获取图片后缀名
 from util.setting import app
 from util.tools import get_user_id_by_request
+
+update_server = UpdateServer()
 
 
 def get_suffix(filename):
@@ -39,6 +43,8 @@ class UploadImageView(HTTPMethodView):
     def __init__(self):
         self.collection = app.mongo["account_center"].user
         self.user_model = UserModel(self.collection)
+        self.follower_model = Follower(app.mongo["account_center"].follower)
+        self.friends_model = FriendModel(app.mongo["account_center"].friends)
 
     async def post(self, request):
         user_id = await get_user_id_by_request(request)
@@ -80,9 +86,9 @@ class UploadImageView(HTTPMethodView):
         im = Image.open(HEAD_PATH + res_path)
 
         sum_path = "/static/img/user/head" + res_path
-        print(sum_path, res_path)
-
-        await self.user_model.update_head(user_id, sum_path)
+        await update_server.update_head("head", sum_path, user_id, self.user_model, self.follower_model,
+                                        self.friends_model, app)
+        # await self.user_model.update_head(user_id, sum_path)
         # 给客户端返回结果
         return_data['results']['path'] = do_main + sum_path
         return_data['results']['width'] = im.size[0]

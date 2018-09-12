@@ -108,6 +108,23 @@ class Follower(MongoDBModel):
         except Exception as e:
             raise AssertionError("关注失败", str(e))
 
+    async def get_followers_count(self, user_id):
+        """
+        get this user_id followers(Fans)
+        :param user_id:
+        :return:
+        """
+        fans_count = await self.collection.count_documents({"following_user_id": user_id})
+        return fans_count
+
+    async def get_following_count(self, user_id):
+        """
+        get how many people does this man following
+        :param user_id:
+        :return:
+        """
+        return await self.collection.count_documents({"myself_user_id": user_id})
+
     async def check_is_mutual_follow(self, id_1, id_2):
         """
         :param id_1:
@@ -395,6 +412,18 @@ class UserModel(MongoDBModel):
         obj = {"head_portrait": sum_path}
         return self.update_by_id(user_id, obj)
 
+    async def update_following_count(self, user_id, count):
+        obj = {"following_count": count}
+        return self.update_by_id(user_id, obj)
+
+    async def update_followers_count(self, user_id, count):
+        obj = {"followers_count": count}
+        return self.update_by_id(user_id, obj)
+
+    async def update_friend_count(self, user_id, count):
+        obj = {"friend_count": count}
+        return self.update_by_id(user_id, obj)
+
     async def find_user_by_name(self, offset, key_words, page_size):
         """
         :param offset:
@@ -406,3 +435,10 @@ class UserModel(MongoDBModel):
             {"name": {'$regex': key_words}}
         ).skip(offset).to_list(page_size)
         return docs
+
+    async def get_head_portrait(self, user_id):
+        doc = await self.find_by_id(user_id)
+        if isinstance(doc, dict):
+            return doc.get("head_portrait", None)
+        else:
+            return None

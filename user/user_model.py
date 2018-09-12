@@ -7,11 +7,11 @@
 """
 import datetime
 
-from models.user_model import Follower
-from user.check_common_mothed import validate_phone, validate_must
+# from models.user_model import Follower
+from user.check_common_mothed import validate_phone, validate_must, validate_password
 from marshmallow import Schema, fields, validates, ValidationError, validate
 from bson import ObjectId
-from util.setting import app
+# from util.setting import app
 
 from util.tools import ObjectID
 
@@ -24,11 +24,12 @@ E = {
 
 
 # follower_model = Follower(app.mongo["account_center"].follower)
-
+# validate.Length.message_all = 'Length must be between {min} and {max}.'
 
 class UserResisterSchema(Schema):
     registered_phone = fields.Str(validate=[validate_phone])
-    password = fields.Str(validate=[validate.Length(min=6, max=20)])
+    # password = fields.Str(validate=[validate.Length(min=6, max=20)])
+    password = fields.Str(validate=[validate_password])
 
 
 class RegisterPhoneSchema(Schema):
@@ -133,15 +134,19 @@ if __name__ == '__main__':
     # print(dir(result))
     # print(result.data)
     # test1()
-    data_list = [{'_id': ObjectId('5b86463e5f627dede7c00731'), 'myself_name': 'fawoaKNNgOTx',
-                  'myself_user_id': '5b7e29dd5f627d0218528819',
-                  'myself_head_portrait': '/static/img/default_head_portrait.jpg', 'following_name': 'fawoM7zemXN7',
-                  'following_user_id': '5b7cfbd45f627ddd88e2c929',
-                  'following_head_portrait': '/static/img/default_head_portrait.png'}]
-    schema = FansSchema(many=True)
-    result = schema.load(data_list)
-    print(result.data)
-
-    data = data_list[0]
-    r = FansSchema().dump(data)
-    print(r.data)
+    # data_list = [{'_id': ObjectId('5b86463e5f627dede7c00731'), 'myself_name': 'fawoaKNNgOTx',
+    #               'myself_user_id': '5b7e29dd5f627d0218528819',
+    #               'myself_head_portrait': '/static/img/default_head_portrait.jpg', 'following_name': 'fawoM7zemXN7',
+    #               'following_user_id': '5b7cfbd45f627ddd88e2c929',
+    #               'following_head_portrait': '/static/img/default_head_portrait.png'}]
+    # schema = FansSchema(many=True)
+    # result = schema.load(data_list)
+    # print(result.data)
+    #
+    # data = data_list[0]
+    # r = FansSchema().dump(data)
+    # print(r.data)
+    data = {"registered_phone": "18819871234", "password": "11111111111111111111111111111111111111111111111"}
+    results, error = UserResisterSchema().load(data)
+    if error:
+        print(error)

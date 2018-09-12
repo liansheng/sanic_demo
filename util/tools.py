@@ -10,6 +10,7 @@ import string
 from functools import wraps
 from sanic_jwt import utils
 from marshmallow import fields
+import sanic.request
 
 from util.config import do_main, default_head_portrait
 
@@ -115,6 +116,35 @@ async def head_portrait_change_change_change(res, default_key="head_portrait"):
     else:
         res[default_key] = do_main + default_head_portrait
     return res
+
+
+async def get_extra(request):
+    """
+    headers host request
+    :param request:
+    :return:
+    """
+    extra = {
+        # 'method': getattr(request, 'method', 0),
+        "headers": getattr(request, 'headers', ""),
+    }
+
+    # if isinstance(request, sanic_request):
+    #     extra['byte'] = len(request.body)
+    # else:
+    #     extra['byte'] = -1
+
+    extra['host'] = 'UNKNOWN'
+    if request is not None:
+        if request.ip:
+            extra['host'] = '{0[0]}:{0[1]}'.format(request.ip)
+
+        extra['request'] = '{0} {1}'.format(request.method,
+                                            request.url)
+    else:
+        extra['request'] = 'nil'
+
+    return extra
 
 
 if __name__ == '__main__':

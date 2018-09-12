@@ -73,15 +73,15 @@ class Register(BaseEndpoint):
     async def check_captcha(self, captcha_key, captcha_num):
         key = await app.redis.get(captcha_key)
         assert key, "验证码已过期"
-        assert key == captcha_num, ("验证码不正确", "原始文本是 {}, 填入文本是 {}".format(key, captcha_num))
+        assert key == captcha_num, "验证码不正确"
 
     @typeassert(UserResisterSchema)
     async def post(self, request, *args, **kwargs):
         # check captcha
         captcha_key = request.cookies.get("captcha", None)
         captcha_num = request.json.get("captcha", None)
-        # assert captcha_key, "验证码未填写"
-        # await self.check_captcha(captcha_key, captcha_num)
+        assert captcha_key, "验证码未填写"
+        await self.check_captcha(captcha_key, captcha_num)
 
         registered_phone = request.json.get('registered_phone', None)
         password = request.json.get('password', None)
@@ -93,7 +93,7 @@ class Register(BaseEndpoint):
         user = await helper.register_new_user(registered_phone=registered_phone, password=password)
         await send_kafka_server.send_to(app=app, topic="user", message_type="register", body=user)
         init_redis = InitRedis(app.redis, UserModel(app.mongo["account_center"].user))
-        await init_redis.add_a_user_id_to_redis(str(user["_id"]))
+        await init_redis.init_registered_info_to_redis(user["user_id"])
 
         access_token, output = await self.responses.get_access_token_output(
             request,
