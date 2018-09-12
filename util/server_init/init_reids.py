@@ -36,9 +36,9 @@ class InitRedis:
 
     async def init_registered_info_to_redis(self, user):
         await self.add_a_user_id_to_redis(user["user_id"])
-        await self.add_user_info_to_redis(user)
+        await self.add_registered_user_info_to_redis(user)
 
-    async def add_user_info_to_redis(self, user):
+    async def add_registered_user_info_to_redis(self, user):
         key = "{}_user_info".format(user["user_id"])
         v = {"name": user["name"], "head_portrait": user["head_portrait"]}
         await self.redis.set(key, json.dumps(v))
