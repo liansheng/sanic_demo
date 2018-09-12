@@ -93,7 +93,7 @@ class Register(BaseEndpoint):
         user = await helper.register_new_user(registered_phone=registered_phone, password=password)
         await send_kafka_server.send_to(app=app, topic="user", message_type="register", body=user)
         init_redis = InitRedis(app.redis, UserModel(app.mongo["account_center"].user))
-        await init_redis.init_registered_info_to_redis(user["user_id"])
+        await init_redis.init_registered_info_to_redis(user)
 
         access_token, output = await self.responses.get_access_token_output(
             request,
