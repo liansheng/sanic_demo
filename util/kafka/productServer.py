@@ -64,6 +64,12 @@ class ProductServer:
 
         await app.producer.send("message", data)
 
+    async def send_someone_else_logged_to_message(self, app, target_user_id):
+        data = {"head": {"to": "", "type": ""}, "body": ""}
+        data["head"]["to"] = str(target_user_id)
+        data["body"] = "该账号已在其他手机登录，如非本人请赶紧登录并修改密码"
+        await app.producer.send("message", data)
+
     # async def send_followers_to_message(self, app, self_user_id, target_user_id):
     #     """
     #     :param app:

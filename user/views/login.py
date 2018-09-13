@@ -9,10 +9,11 @@ from sanic_jwt import BaseEndpoint
 from sanic_jwt import utils
 # from sanic.log import l
 
+from util.config import EXPIRATION_DELTA
 from util.kafka.productServer import SendServer
 from util.responsePack import response_package
 from util.setting import app
-from util.tools import get_extra
+from util.tools import get_extra, get_login_device
 import logging
 
 send_kafka_server = SendServer()
@@ -22,17 +23,27 @@ logger = logging.getLogger("user")
 class MyAuthenticateEndpoint(BaseEndpoint):
 
     async def post(self, request, *args, **kwargs):
+        """
+        generate two tokes depending on the login device.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         request, args, kwargs = await self.do_incoming(request, args, kwargs)
 
         config = self.config
         user = await utils.call(
             self.instance.auth.authenticate, request, *args, **kwargs
         )
-
+        user_id = await utils.call(self.instance.auth._get_user_id, user)
+        print("user_id ", user_id)
+        login_device = await get_login_device(request)
+        print("login device ", login_device)
         access_token, output = await self.responses.get_access_token_output(
             request, user, self.config, self.instance
         )
-
+        await app.redis.set("{}_{}".format(login_device, user_id), access_token, expire=EXPIRATION_DELTA)
         if config.refresh_token_enabled():
             refresh_token = await utils.call(
                 self.instance.auth.generate_refresh_token, request, user

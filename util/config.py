@@ -32,6 +32,9 @@ IMG_RELATIVE_PATH = "/static/img/"
 HEAD_PATH = "/var/www/static/img/user/head/"
 IMG_PATH = "/var/www/static/"
 
+
+EXPIRATION_DELTA = 60 * 60 * 24
+
 hostname = socket.gethostname()
 hostname = "xianshang"
 if hostname == "ubuntu":

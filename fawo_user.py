@@ -18,6 +18,7 @@ from user.views.registered_view import Register, Captcha
 from user.views.logout_view import LogoutEndpoint
 from user.views.refresh_endpoint import MyRefreshEndpoint
 # from util.kafka.producer import ProducerClient
+from util.config import EXPIRATION_DELTA
 from util.setting import app
 from sanic_jwt import utils
 from user.views.following_view import user_bp
@@ -57,7 +58,7 @@ async def print_on_response(request, response):
 i = initialize(
     app,
     refresh_token_enabled=True,
-    expiration_delta=60 * 60 * 24,
+    expiration_delta=EXPIRATION_DELTA,
     url_prefix="/api_user/v1/auth",
     class_views=(('/register', Register),
                  # ("/check_phone", CheckRegisteredParm),

@@ -14,10 +14,11 @@ from util.marshal_with.data_check import typeassert, typeassert_async
 from util.responsePack import response_package
 from util.setting import app
 from user.check_common_mothed import gen_password
+from util.tools import get_login_device
 
 
 class MyAuthentication(Authentication):
-    expiration_delta = 60 * 60 * 24
+    # expiration_delta = 60 * 60 * 24
     url_prefix = "/api_user/v1/auth"
 
     # def __init__(self, *args, **kwargs):
@@ -95,6 +96,15 @@ class MyAuthentication(Authentication):
         return token
 
     async def retrieve_user(self, request, payload, *args, **kwargs):
+        """
+        only two client, 1 pc, 1 mobile,
+        so, at the time of login, generate two tokes depending on the login device. see login function
+        :param request:
+        :param payload:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         collection = app.mongo["account_center"].user
         user_model = UserModel(collection)
         print("retrieve_user payload is ", payload)
@@ -104,6 +114,15 @@ class MyAuthentication(Authentication):
                 raise exceptions.AuthenticationFailed()
             docs = await user_model.find_by_id(user_id)
             print("docs : ", docs)
+            # if not docs:
+            # return response_package("401", {"user_id": None})
+            login_device = await get_login_device(request)
+            access_token = await app.redis.get("{}_{}".format(login_device, user_id))
+            if not access_token:
+                return response_package("401", {"user_id": None})
+            token = self._get_token(request)
+            if token != access_token:
+                return response_package("401", {"user_id": None})
             if docs:
                 # return response_package("200", UserLoginAfter(**docs).to_dict())
                 return UserLoginAfter(**docs).to_dict()
