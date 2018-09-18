@@ -6,10 +6,11 @@
 @time: 8/31/18 12:26 AM
 """
 # message definition
+# 关注12 ，加好友 13
 MESSAGE_TYPE_MAP = {
-    "followers": "12",
-    "following": "14",
-    "friend": "13"
+    # "followers": "12",
+    "following": "12",
+    "friend": "13",
 }
 
 base = {

@@ -17,6 +17,7 @@ from sanic.views import HTTPMethodView
 from sanic.response import text, json
 from sanic.exceptions import ServerError
 from sanic_jwt.decorators import protected, inject_user
+from sanic_jwt.exceptions import AuthenticationFailed
 
 from user.views.edit_profile import EditView
 from user.views.head_view import UploadImageView
@@ -61,7 +62,9 @@ class Follow(HTTPMethodView):
         # param check
         # print(" user_id ", user.user_id)
         login_user_id = await get_user_id_by_request(request)
-        assert login_user_id, "当前没有用户登录"
+        if not login_user_id:
+            raise AuthenticationFailed()
+        # assert login_user_id,
         following_user_id = request.json.get("following_user_id", None)
         assert following_user_id, "参数不能为空"
         assert login_user_id != following_user_id, (

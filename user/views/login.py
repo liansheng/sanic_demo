@@ -10,11 +10,13 @@ from sanic_jwt import utils
 # from sanic.log import l
 
 from util.config import EXPIRATION_DELTA
-from util.kafka.productServer import SendServer
+from util.kafka.productServer import SendServer, ProductServer
 from util.responsePack import response_package
 from util.setting import app
 from util.tools import get_extra, get_login_device
 import logging
+
+product_server = ProductServer()
 
 send_kafka_server = SendServer()
 logger = logging.getLogger("user")
@@ -40,6 +42,9 @@ class MyAuthenticateEndpoint(BaseEndpoint):
         print("user_id ", user_id)
         login_device = await get_login_device(request)
         print("login device ", login_device)
+        token = await app.redis.get("{}_{}".format(login_device, user_id))
+        if token:
+            await product_server.send_someone_else_logged_to_message(app, user_id)
         access_token, output = await self.responses.get_access_token_output(
             request, user, self.config, self.instance
         )

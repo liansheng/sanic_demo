@@ -7,6 +7,13 @@
 """
 from util.kafka.content_definition import MESSAGE_TYPE_MAP, base, send_user_sum, USER_MESSAGE_TYPE_ANTI_MAP
 
+data = {"head":
+    {
+        "to": "",
+        "type": ""
+    },
+    "body": ""}
+
 
 class ProductServer:
 
@@ -65,8 +72,13 @@ class ProductServer:
         await app.producer.send("message", data)
 
     async def send_someone_else_logged_to_message(self, app, target_user_id):
-        data = {"head": {"to": "", "type": ""}, "body": ""}
+        """
+        :param app:
+        :param target_user_id:
+        :return:
+        """
         data["head"]["to"] = str(target_user_id)
+        data["head"]["type"] = "16"
         data["body"] = "该账号已在其他手机登录，如非本人请赶紧登录并修改密码"
         await app.producer.send("message", data)
 

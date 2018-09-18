@@ -78,7 +78,7 @@ class Register(BaseEndpoint):
     @typeassert(UserResisterSchema)
     async def post(self, request, *args, **kwargs):
         # check captcha
-        captcha_key = request.cookies.get("captcha", None)
+        captcha_key = request.json.get("captcha_mark", None)
         captcha_num = request.json.get("captcha", None)
         assert captcha_key, "验证码未填写"
         await self.check_captcha(captcha_key, captcha_num)
@@ -142,5 +142,5 @@ class Captcha(BaseEndpoint):
         await app.redis.set(str(uuid), str(x.text), expire=CAPTCHA_TIMEOUT)
 
         response = json(response_package("200", {"image_b64data": img_str, "captcha": uuid}))
-        response.cookies["captcha"] = str(uuid)
+        # response.cookies["captcha"] = str(uuid)
         return response
