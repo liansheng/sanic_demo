@@ -5,6 +5,7 @@
 @file: producerServer.py
 @time: 9/2/18 10:47 PM
 """
+import datetime as dt
 from util.kafka.content_definition import MESSAGE_TYPE_MAP, base, send_user_sum, USER_MESSAGE_TYPE_ANTI_MAP
 
 data = {"head":
@@ -43,10 +44,11 @@ class ProductServer:
         base["target_user_id"] = target_user_id
         base["content"] = "{}XX关注了你，可以互相聊天了".format(self_user_name)
 
-        data = {"head": {"to": "", "type": ""}, "body": ""}
+        data = {"head": {"to": "", "type": "", "time": ""}, "body": ""}
         data["head"]["to"] = str(target_user_id)
         data["head"]["type"] = MESSAGE_TYPE_MAP["friend"]
         data["head"]["from"] = str(self_user_id)
+        data["head"]["time"] = str(dt.datetime.now())
         data["body"] = "{}XX关注了你，可以互相聊天了".format(self_user_name)
 
         await app.producer.send("message", data)
@@ -64,9 +66,10 @@ class ProductServer:
         base["target_user_id"] = target_user_id
         base["content"] = "{}关注了你，关注对方开启聊天".format(self_user_name)
 
-        data = {"head": {"to": "", "type": ""}, "body": ""}
+        data = {"head": {"to": "", "type": "", "time": ""}, "body": ""}
         data["head"]["to"] = str(target_user_id)
         data["head"]["type"] = MESSAGE_TYPE_MAP["following"]
+        data["head"]["time"] = str(dt.datetime.now())
         data["body"] = "{}关注了你，关注对方开启聊天".format(self_user_name)
 
         await app.producer.send("message", data)

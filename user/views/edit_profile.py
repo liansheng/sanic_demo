@@ -50,6 +50,8 @@ class EditView(HTTPMethodView):
                         raise InvalidUsage("{} 已被使用".format(v))
             # name need update to follow and friend collection
             doc = await self.user_model.update_by_id(user_id, new_data)
+            if not doc:
+                return response.json(response_package("500", {"error_id": str(user_id)}))
             for k, v in new_data.items():
                 if k in self.update_to_friend_follow:
                     await update_server.update_name(k, v, user_id, self.follower_model, self.friends_model, app,
