@@ -11,6 +11,8 @@ from sanic.exceptions import SanicException
 import time
 import hashlib
 
+from util.config import OPERATION_ACCOUNT
+
 
 def validate_must(field):
     if not field:
@@ -26,6 +28,8 @@ def validate_password(password):
 
 
 def validate_phone(phone):
+    if phone in OPERATION_ACCOUNT:
+        pass
     phone_pat = re.compile('^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$')
     res = re.match(phone_pat, phone)
     # print("validate_phone res : ", res)

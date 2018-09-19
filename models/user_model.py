@@ -103,6 +103,8 @@ class Follower(MongoDBModel):
             else:
                 new_data = copy.deepcopy(data1)
                 new_data.update(data2)
+                if "created_time" not in new_data:
+                    new_data["created_time"] = dt.datetime.now()
                 await self.create(new_data)
             return True
         except Exception as e:

@@ -79,11 +79,17 @@ class WriteModelServer:
                 following_user_id = following_user_id.decode()
             await app.redis.sadd("{}_{}".format(login_user_id, "follower"), following_user_id)
 
-        await self.sync_user_follower_friend_count(login_user_id, follower_model, user_model, friends_model)
+        await self.sync_user_follower_friend_count(login_user_id, following_user_id, follower_model, user_model,
+                                                   friends_model)
 
-    async def sync_user_follower_friend_count(self, user_id, follower_model, user_model, friends_model):
+    async def sync_user_follower_friend_count(self, user_id, following_user_id, follower_model, user_model,
+                                              friends_model):
         """
         :param user_id:
+        :param following_user_id:
+        :param follower_model:
+        :param user_model:
+        :param friends_model:
         :return:
         """
         followers_count = await follower_model.get_followers_count(user_id)
@@ -93,6 +99,14 @@ class WriteModelServer:
         await user_model.update_followers_count(user_id, followers_count)
         await user_model.update_following_count(user_id, following_count)
         await user_model.update_friend_count(user_id, friend_count)
+
+        following_user_id_followers_count = await follower_model.get_followers_count(following_user_id)
+        following_user_id_following_count = await follower_model.get_following_count(following_user_id)
+        following_user_id_friend_count = await friends_model.get_friends_count(following_user_id)
+
+        await user_model.update_followers_count(following_user_id, following_user_id_followers_count)
+        await user_model.update_following_count(following_user_id, following_user_id_following_count)
+        await user_model.update_friend_count(following_user_id, following_user_id_friend_count)
 
         pass
 

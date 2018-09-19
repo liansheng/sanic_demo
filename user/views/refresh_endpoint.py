@@ -7,8 +7,10 @@
 """
 from sanic_jwt import BaseEndpoint, utils, exceptions
 
+from util.config import EXPIRATION_DELTA
 from util.responsePack import response_package
-
+from util.tools import get_login_device
+from util.setting import app
 
 class MyRefreshEndpoint(BaseEndpoint):
 
@@ -52,6 +54,9 @@ class MyRefreshEndpoint(BaseEndpoint):
             )
         )
         output = await self.do_output(output)
+        # in this time, You need to refresh device token
+        login_device = await get_login_device(request)
+        await app.redis.set("{}_{}".format(login_device, user_id), access_token, expire=EXPIRATION_DELTA)
 
         resp = self.responses.get_token_reponse(
             request, access_token, output, config=self.config
