@@ -50,7 +50,7 @@ class SearchUser(HTTPMethodView):
         """
         # print(dir(request))
         # print(dir(request.get))
-        # user_id = await get_user_id_by_request(request)
+        login_user_id = await get_user_id_by_request(request)
         data = parameter_check.search_user_check(request.raw_args)
 
         model = self.MAPPING[data["type"]]
@@ -60,9 +60,9 @@ class SearchUser(HTTPMethodView):
         res_data = schema(many=True).dump(data_list).data
         for tmp in res_data:
             print(data["user_id"], str(tmp["user_id"]))
-            tmp["is_i_follow_him"] = await self.follower_model.check_user1_is_following_user2(data["user_id"],
+            tmp["is_i_follow_him"] = await self.follower_model.check_user1_is_following_user2(login_user_id,
                                                                                               str(tmp["user_id"]))
-            tmp["is_friend"] = await self.follower_model.check_is_mutual_follow(data["user_id"], str(tmp["user_id"]))
+            tmp["is_friend"] = await self.follower_model.check_is_mutual_follow(login_user_id, str(tmp["user_id"]))
             tmp = await head_portrait_change_change_change(tmp, "user_head_portrait")
 
         print("data_list is ", data_list)

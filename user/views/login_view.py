@@ -7,6 +7,8 @@
 """
 from sanic_jwt import initialize, Authentication, exceptions, utils
 from sanic.response import json
+from sanic_jwt.exceptions import AuthenticationFailed, InvalidAuthorizationHeader
+
 from models.user_model import UserModel
 from user.user_marshal import UserLoginAfter, UserReadModel
 from user.user_model import UserResisterSchema
@@ -108,29 +110,25 @@ class MyAuthentication(Authentication):
         collection = app.mongo["account_center"].user
         user_model = UserModel(collection)
         print("retrieve_user payload is ", payload)
-        if payload:
-            user_id = payload.get("user_id", None)
-            if user_id is None:
-                raise exceptions.AuthenticationFailed()
-            docs = await user_model.find_by_id(user_id)
-            print("docs : ", docs)
-            # if not docs:
-            # return response_package("401", {"user_id": None})
-            login_device = await get_login_device(request)
-            access_token = await app.redis.get("{}_{}".format(login_device, user_id))
-            if not access_token:
-                return response_package("401", {"user_id": None})
-            token = self._get_token(request)
-            if token != access_token:
-                return response_package("401", {"user_id": None})
-            if docs:
-                # return response_package("200", UserLoginAfter(**docs).to_dict())
-                return UserLoginAfter(**docs).to_dict()
-            else:
-                return response_package("401", {"user_id": None})
-            # return {"user_id": user_id}
-        else:
-            return response_package("401", {"user_id": None})
+        only_user = kwargs.get("only_user", None)
+        if not payload:
+            raise AuthenticationFailed()
+        user_id = payload.get("user_id", None)
+        if user_id is None:
+            raise exceptions.InvalidAuthorizationHeader()
+        docs = await user_model.find_by_id(user_id)
+        if not docs:
+            raise InvalidAuthorizationHeader()
+        if only_user:
+            return UserLoginAfter(**docs).to_dict()
+        login_device = await get_login_device(request)
+        access_token = await app.redis.get("{}_{}".format(login_device, user_id))
+        if not access_token:
+            raise AuthenticationFailed()
+        # token = self._get_token(request)  # 2018-09-21 18:24:00, wym.........
+        # if token != access_token:
+        #     raise AuthenticationFailed()
+        return UserLoginAfter(**docs).to_dict()
 
     async def logout(self, user_id, *args, **kwargs):
         key = "refresh_token_{user_id}".format(user_id=user_id)

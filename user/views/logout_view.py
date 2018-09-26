@@ -14,6 +14,8 @@ from util.responsePack import response_package
 from util.setting import app
 import json
 
+from util.tools import get_login_device
+
 
 class LogoutEndpoint(BaseEndpoint):
     async def get(self, request):
@@ -23,15 +25,18 @@ class LogoutEndpoint(BaseEndpoint):
         """
         print("begin logout ")
         payload = self.instance.auth.extract_payload(request, verify=False)
-        user = await utils.call(
-            self.instance.auth.retrieve_user, request, payload=payload
-        )
-        user_id = await self.instance.auth._get_user_id(user)
+        # user = await utils.call(
+        #     self.instance.auth.retrieve_user, request, payload=payload
+        # )
+        user_id = payload.get("user_id", None)
+        # user_id = await self.instance.auth._get_user_id(user)
         logout_result = await utils.call(
             self.instance.auth.logout,
             request=request,
             user_id=user_id,
         )
+        login_device = await get_login_device(request)
+        await app.redis.delete("{}_{}".format(login_device, str(user_id)))
         return response.json(response_package("200", {}))
 
     # async def post(self, request, *args, **kwargs):

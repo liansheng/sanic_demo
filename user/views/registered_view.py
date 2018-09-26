@@ -19,14 +19,14 @@ from sanic_jwt import BaseEndpoint, exceptions
 from models.user_model import UserModel
 from user.user_marshal import UserResister, UserRegisteredOnlyRead
 from user.user_model import UserResisterSchema, RegisterPhoneSchema
-from util.config import STATIC_IMG_DIR, CAPTCHA_TIMEOUT, IMG_RELATIVE_PATH
+from util.config import STATIC_IMG_DIR, CAPTCHA_TIMEOUT, IMG_RELATIVE_PATH, EXPIRATION_DELTA
 from util.kafka.productServer import SendServer
 from util.marshal_with.data_check import typeassert, typeassert_async
 from util.responsePack import response_package
 from util.server_init.init_reids import InitRedis
 from util.setting import app
 from user.services.captcha import CreateCaptcha
-from util.tools import random_str
+from util.tools import random_str, get_login_device
 import datetime as dt
 
 send_kafka_server = SendServer()
@@ -106,9 +106,11 @@ class Register(BaseEndpoint):
             self.config.refresh_token_name(): refresh_token
         })
 
-        user_id = user.get("id", None)
+        user_id = user.get("user_id", None)
         key = "refresh_token_{user_id}".format(user_id=user_id)
         res = await app.redis.set(key, refresh_token)
+        login_device = await get_login_device(request)
+        await app.redis.set("{}_{}".format(login_device, user_id), access_token, expire=EXPIRATION_DELTA)
         output.clear()
 
         output.update(response_package("200", {"access_token": access_token,

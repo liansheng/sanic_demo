@@ -12,6 +12,7 @@ from util.responsePack import response_package
 from util.tools import get_login_device
 from util.setting import app
 
+
 class MyRefreshEndpoint(BaseEndpoint):
 
     async def post(self, request, *args, **kwargs):
@@ -21,7 +22,7 @@ class MyRefreshEndpoint(BaseEndpoint):
         # - Add more exceptions
         payload = self.instance.auth.extract_payload(request, verify=False)
         user = await utils.call(
-            self.instance.auth.retrieve_user, request, payload=payload
+            self.instance.auth.retrieve_user, request, payload=payload, only_user=True
         )
         user_id = await self.instance.auth._get_user_id(user)
         refresh_token = await utils.call(

@@ -155,3 +155,5 @@ class WriteModelServer:
             # 4 update or created redis
         await user_model.sub_follow_count(login_user_id, following_user_id)
         await app.redis.srem("{}_{}".format(login_user_id, "follower"), following_user_id)
+        await self.sync_user_follower_friend_count(login_user_id, following_user_id, follower_model, user_model,
+                                                   friends_model)

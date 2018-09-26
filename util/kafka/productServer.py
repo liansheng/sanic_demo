@@ -42,14 +42,14 @@ class ProductServer:
         base["message_type"] = MESSAGE_TYPE_MAP["friend"]
         base["self_user_id"] = self_user_id
         base["target_user_id"] = target_user_id
-        base["content"] = "{}XX关注了你，可以互相聊天了".format(self_user_name)
+        base["content"] = "{}关注了你，可以互相聊天了".format(self_user_name)
 
         data = {"head": {"to": "", "type": "", "time": ""}, "body": ""}
         data["head"]["to"] = str(target_user_id)
         data["head"]["type"] = MESSAGE_TYPE_MAP["friend"]
         data["head"]["from"] = str(self_user_id)
         data["head"]["time"] = str(dt.datetime.now())
-        data["body"] = "{}XX关注了你，可以互相聊天了".format(self_user_name)
+        data["body"] = "{}关注了你，可以互相聊天了".format(self_user_name)
 
         await app.producer.send("message", data)
         pass
