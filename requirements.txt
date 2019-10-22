@@ -70,7 +70,7 @@ pyxdg==0.25
 PyYAML==3.13
 redis==2.10.6
 reportlab==3.3.0
-requests==2.9.1
+requests==2.20.0
 sanic==0.7.0
 Sanic-Cors==0.9.4
 sanic-jwt==1.1.2
