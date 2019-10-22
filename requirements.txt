@@ -66,7 +66,7 @@ python-apt==1.1.0b1+ubuntu0.16.4.2
 python-debian==0.1.27
 python-systemd==231
 pytz==2018.5
-pyxdg==0.25
+pyxdg==0.26
 PyYAML==3.13
 redis==2.10.6
 reportlab==3.3.0
