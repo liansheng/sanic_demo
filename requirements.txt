@@ -103,7 +103,7 @@ unity-scope-tomboy==0.1
 unity-scope-virtualbox==0.1
 unity-scope-yelp==0.1
 unity-scope-zotero==0.1
-urllib3==1.13.1
+urllib3==1.24.2
 usb-creator==0.3.0
 user-agents==1.1.0
 uvloop==0.11.0
