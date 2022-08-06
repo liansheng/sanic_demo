@@ -71,7 +71,7 @@ PyYAML==5.1
 redis==2.10.6
 reportlab==3.5.55
 requests==2.20.0
-sanic==0.7.0
+sanic==20.12.7
 Sanic-Cors==0.9.4
 sanic-jwt==1.1.2
 sanic-mongo==1.7.1
